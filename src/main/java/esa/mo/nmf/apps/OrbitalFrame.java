@@ -102,12 +102,12 @@ public class OrbitalFrame {
 
         
 //        System.out.println(nadir);
-        Quaternion inertialAttitude = FuzzyControlAdapter.getInertialAttitude();
+//        Quaternion inertialAttitude = FuzzyControlAdapter.getInertialAttitude();
 //        System.out.println("inertial attitude = "+inertialAttitude.getA()
 //                                                +inertialAttitude.getB()+
 //                                                +inertialAttitude.getC()+
 //                                                +inertialAttitude.getD());
-//        Quaternion inertialAttitude = Comms.inertialAttitude;
+        Quaternion inertialAttitude = Comms.inertialAttitude;
         Rotation bodyToInertialRotation = new Rotation(inertialAttitude.getA(),
                                         -inertialAttitude.getB(),
                                         -inertialAttitude.getC(),
@@ -130,8 +130,8 @@ public class OrbitalFrame {
         sun = orekitSunVector;
 //        System.out.println("orekit sun = "+sun.toString());
         Rotation inertialToExperimentRotation = new Rotation(nadir, sun , 
-                new org.hipparchus.geometry.euclidean.threed.Vector3D(0.0,0.0, 1.0),
-                new org.hipparchus.geometry.euclidean.threed.Vector3D(0.0,-1.0,0.0));
+                new org.hipparchus.geometry.euclidean.threed.Vector3D(0.0,0.0, -1.0),
+                new org.hipparchus.geometry.euclidean.threed.Vector3D(-1.0,0.0,0.0));
         
 //        System.out.println("Inertial to Experiment: " + inertialToExperimentRotation.getQ0()+
 //                                                        inertialToExperimentRotation.getQ1()+

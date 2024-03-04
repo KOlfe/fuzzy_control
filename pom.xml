@@ -27,8 +27,8 @@
   <version>1.0.0</version>
   <packaging>jar</packaging>
 
-  <name>E-USOC NMF App - Fuzzy Control</name>
-  <description>Attitude control algorithms comparator.</description>
+  <name>E-USOC NMF SDK App - Fuzzy Control</name>
+  <description>Attitude fuzzy controller.</description>
   <url>https://www.eusoc.upm.es</url>
 
   <organization>

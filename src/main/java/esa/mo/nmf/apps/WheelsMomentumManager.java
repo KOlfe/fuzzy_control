@@ -74,9 +74,9 @@ public class WheelsMomentumManager extends Thread{
                 m.setY(m.getY()*scale);
                 m.setZ(m.getZ()*scale);
             }
-//            Comms.m.setX(m.getX());
-//            Comms.m.setY(m.getY());
-//            Comms.m.setZ(m.getZ());
+            Comms.m.setX(m.getX());
+            Comms.m.setY(m.getY());
+            Comms.m.setZ(m.getZ());
 //            System.out.println("B = "+B);
 //            System.out.println("w = "+w);
 //            System.out.println("m = "+m);
@@ -99,28 +99,28 @@ public class WheelsMomentumManager extends Thread{
     }
     
     void updateWheelPerpendicular(){
-        double lenght = sqrt(FuzzyControl.magneticField.getX()*FuzzyControl.magneticField.getX()+
-                       FuzzyControl.magneticField.getY()*FuzzyControl.magneticField.getY()+
-                       FuzzyControl.magneticField.getZ()*FuzzyControl.magneticField.getZ());
-                
-        B.setX(FuzzyControl.magneticField.getX()/(float)lenght);
-        B.setY(FuzzyControl.magneticField.getY()/(float)lenght);
-        B.setZ(FuzzyControl.magneticField.getZ()/(float)lenght);
+//        double lenght = sqrt(FuzzyControl.magneticField.getX()*FuzzyControl.magneticField.getX()+
+//                       FuzzyControl.magneticField.getY()*FuzzyControl.magneticField.getY()+
+//                       FuzzyControl.magneticField.getZ()*FuzzyControl.magneticField.getZ());
+//                
+//        B.setX(FuzzyControl.magneticField.getX()/(float)lenght);
+//        B.setY(FuzzyControl.magneticField.getY()/(float)lenght);
+//        B.setZ(FuzzyControl.magneticField.getZ()/(float)lenght);
+//
+////         Desaturating 3 wheels        
+//        w.setX(FuzzyControlAdapter.wheelsSpeed.get(0));
+//        w.setY(FuzzyControlAdapter.wheelsSpeed.get(1));
+//        w.setZ(FuzzyControlAdapter.wheelsSpeed.get(2));
 
-//         Desaturating 3 wheels        
-        w.setX(FuzzyControlAdapter.wheelsSpeed.get(0));
-        w.setY(FuzzyControlAdapter.wheelsSpeed.get(1));
-        w.setZ(FuzzyControlAdapter.wheelsSpeed.get(2));
-
-//        double lenght = sqrt(Comms.B.getX()*Comms.B.getX()+
-//                       Comms.B.getY()*Comms.B.getY()+
-//                       Comms.B.getZ()*Comms.B.getZ());                
-//        B.setX(Comms.B.getX()/(float)lenght);
-//        B.setY(Comms.B.getY()/(float)lenght);
-//        B.setZ(Comms.B.getZ()/(float)lenght);
-//        w.setX(Comms.wheelsSpeed.get(0));
-//        w.setY(Comms.wheelsSpeed.get(1));
-//        w.setZ(Comms.wheelsSpeed.get(2));
+        double lenght = sqrt(Comms.B.getX()*Comms.B.getX()+
+                       Comms.B.getY()*Comms.B.getY()+
+                       Comms.B.getZ()*Comms.B.getZ());                
+        B.setX(Comms.B.getX()/(float)lenght);
+        B.setY(Comms.B.getY()/(float)lenght);
+        B.setZ(Comms.B.getZ()/(float)lenght);
+        w.setX(Comms.wheelsSpeed.get(0));
+        w.setY(Comms.wheelsSpeed.get(1));
+        w.setZ(Comms.wheelsSpeed.get(2));
 
 // Desaturating six wheels        
 //        w.setX(FuzzyControl.adcsApi.Get_ReactionWheel_All_Speeds().getINTERNAL().getX()
@@ -150,12 +150,12 @@ public class WheelsMomentumManager extends Thread{
         
 // For 3 wheels
         for (int i=0;i<3;i++){
-          if (abs(FuzzyControlAdapter.wheelsSpeed.get(i))>0.15*FuzzyControl.WHEEL_MAX_SPEED){
-              return false;
-          }
-//          if (abs(Comms.wheelsSpeed.get(i))>0.15*FuzzyControl.WHEEL_MAX_SPEED){
+//          if (abs(FuzzyControlAdapter.wheelsSpeed.get(i))>0.15*FuzzyControl.WHEEL_MAX_SPEED){
 //              return false;
 //          }
+          if (abs(Comms.wheelsSpeed.get(i))>0.15*FuzzyControl.WHEEL_MAX_SPEED){
+              return false;
+          }
       }
 //        if (
 //                abs(FuzzyControl.adcsApi.Get_ReactionWheel_All_Speeds().getINTERNAL().getX())>0.15*FuzzyControl.WHEEL_MAX_SPEED||
@@ -177,9 +177,9 @@ public class WheelsMomentumManager extends Thread{
             } catch (NMFException | IOException | MALInteractionException | MALException ex) {
                 Logger.getLogger(WheelsMomentumManager.class.getName()).log(Level.SEVERE, null, ex);
             }
-//            Comms.m.setX(0.0f);
-//            Comms.m.setY(0.0f);
-//            Comms.m.setZ(0.0f);
+            Comms.m.setX(0.0f);
+            Comms.m.setY(0.0f);
+            Comms.m.setZ(0.0f);
     }
     
 }

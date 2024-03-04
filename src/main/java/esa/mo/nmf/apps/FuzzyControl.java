@@ -71,10 +71,9 @@ import org.orekit.propagation.analytical.tle.TLE;
  */
 public class FuzzyControl {
     static final NanoSatMOConnectorImpl connector = new NanoSatMOConnectorImpl();
-    private static final Logger LOGGER = Logger.getLogger(FuzzyControlAdapter.class.getName());
     static final TaskScheduler TIMER = new TaskScheduler(1);
     protected static final int REFRESH_RATE =2000;
-    private static Quaternion currentAttitude = new Quaternion();
+    static Quaternion currentAttitude = new Quaternion();
     private static Quaternion targetAttitude = new Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
     static Quaternion error = new Quaternion();
     static Quaternion previousError = new Quaternion(0f, 0f, 0f, 0f);
@@ -82,7 +81,7 @@ public class FuzzyControl {
     static VectorF3D angularVelocity = new VectorF3D(0.0f, 0.0f, 0.0f);
     static VectorF3D magneticField = new VectorF3D();
     static VectorF3D actuation = new VectorF3D();
-    static VectorF3D torque = new VectorF3D();
+    static VectorF3D torque = new VectorF3D(0.0f, 0.0f, 0.0f);
     static FloatList wheelTargetVelocities = new FloatList(3);
     static FunctionBlock fb_x;
     static FunctionBlock fb_y;
@@ -93,13 +92,16 @@ public class FuzzyControl {
     static final Float WHEEL_MAX_SPEED = (float)(0.8*10000.0*PI/30.0) ;
     static final Float WHEEL_MAX_TORQUE = (float)(0.8e-4) ;
     static final Float WHEEL_INERTIA = (float)(1.5465e-6) ;
-    static final File TELEMETRY_FILE = new File (System.getProperty("user.dir")+"/toGroundLP/TM_"+String.valueOf(System.currentTimeMillis())+".dat");
-    static final File LOG_FILE = new File (System.getProperty("user.dir")+"/toGround/log_"+String.valueOf(System.currentTimeMillis())+".txt");
+//    static final File TELEMETRY_FILE = new File (System.getProperty("user.dir")+"/toGroundLP/TM_"+String.valueOf(System.currentTimeMillis())+".dat");
+//    static final File LOG_FILE = new File (System.getProperty("user.dir")+"/toGround/log_"+String.valueOf(System.currentTimeMillis())+".txt");
+    static final File TELEMETRY_FILE = new File (System.getProperty("user.dir")+"\\toGroundLP\\TM_"+String.valueOf(System.currentTimeMillis())+".dat");
+    static final File LOG_FILE = new File (System.getProperty("user.dir")+"\\toGround\\log_"+String.valueOf(System.currentTimeMillis())+".txt");
     static FuzzyControlAdapter adapter;
     static AttitudeTelemetry attitudeTm;
     static ActuatorsTelemetry actuatorsTm;
     static boolean iADCSinitialConectionError=true;
     static int reconnectionTry = 0;
+    static boolean controlFlag = true;
 
  //   static SEPP_IADCS_API adcsApi= new SEPP_IADCS_API();
 
@@ -110,7 +112,7 @@ public class FuzzyControl {
      * @throws java.lang.Exception If there is an error
      */
     public static void main(final String args[]) {
-//        Comms.initComms();
+        Comms.initComms();
 
         try {
             Files.deleteIfExists(new File("comArchive.db").toPath());
@@ -148,7 +150,20 @@ public class FuzzyControl {
         updateTLE();
         
         TIMELINE_EXECUTOR.start();
-                
+        
+        executeMain(REFRESH_RATE, 5000);                                                                         
+    
+    
+        TIMER.scheduleTask(new Thread() {
+            @Override
+            public void run() {
+        Comms.read42();
+        Comms.write42(torque);
+    }
+    }, 0, 200, TimeUnit.MILLISECONDS, true); 
+    }
+    
+    static void executeMain(int refreshRate, int initialDelay){
         TIMER.scheduleTask(new Thread() {
             @Override 
             public void run() {
@@ -158,30 +173,34 @@ public class FuzzyControl {
                         reconnectionTry = 0;
                     }
 //                    Comms.read42();
-                    attitudeTm = connector.getPlatformServices().getAutonomousADCSService().getStatus().getBodyElement0();
-                    OrbitalFrame.nmfSunVector = attitudeTm.getSunVector();
-                    magneticField = attitudeTm.getMagneticField();
-                    angularVelocity = attitudeTm.getAngularVelocity();
-                    FuzzyControlAdapter.setInertialAttitude(attitudeTm.getAttitude());
-                    actuatorsTm = connector.getPlatformServices().getAutonomousADCSService().getStatus().getBodyElement1();
-                    mtqDipoleMoment = actuatorsTm.getMtqDipoleMoment();
-                    FuzzyControlAdapter.wheelsSpeed = actuatorsTm.getCurrentWheelSpeed().getRotationalSpeed();
+//                    attitudeTm = connector.getPlatformServices().getAutonomousADCSService().getStatus().getBodyElement0();
+//                    OrbitalFrame.nmfSunVector = attitudeTm.getSunVector();
+//                    magneticField = attitudeTm.getMagneticField();
+//                    angularVelocity = attitudeTm.getAngularVelocity();
+//                    FuzzyControlAdapter.setInertialAttitude(attitudeTm.getAttitude());
+//                    actuatorsTm = connector.getPlatformServices().getAutonomousADCSService().getStatus().getBodyElement1();
+//                    mtqDipoleMoment = actuatorsTm.getMtqDipoleMoment();
+//                    FuzzyControlAdapter.wheelsSpeed = actuatorsTm.getCurrentWheelSpeed().getRotationalSpeed();
                                         
                     OrbitalFrame.getOrbitalFrame();
                     currentAttitude = OrbitalFrame.getOrbitalAttitude();
 //                    System.out.println("atitude = "+currentAttitude.toString());
-                    executeControlLoop();
+                    if (controlFlag){
+                        executeControlLoop();    
+                    }
                     reconnectionTry = 0;
-                } catch (NMFException | IOException | MALInteractionException | MALException ex) {
+                    Util.writeTelemtry();
+//                } catch (NMFException | IOException | MALInteractionException | MALException ex) {
                     reconnectionTry++;
-                    Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
+//                    Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
                     log("iADCS not responding");
                 } catch (InterruptedException ex) {
                     Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        }, 5000, REFRESH_RATE, TimeUnit.MILLISECONDS, true);
+        }, initialDelay, refreshRate, TimeUnit.MILLISECONDS, true);        
     }
+
     
     static void executeControlLoop() {
 //        System.out.println("init control loop");
@@ -308,13 +327,13 @@ public class FuzzyControl {
             
 // Get only three velocities          
 
-            wheelTargetVelocities.set(0, actuation.getX()*REFRESH_RATE/1000f+FuzzyControlAdapter.wheelsSpeed.get(0));
-            wheelTargetVelocities.set(1, actuation.getY()*REFRESH_RATE/1000f+FuzzyControlAdapter.wheelsSpeed.get(1));
-            wheelTargetVelocities.set(2, actuation.getZ()*REFRESH_RATE/1000f+FuzzyControlAdapter.wheelsSpeed.get(2));
+//            wheelTargetVelocities.set(0, actuation.getX()*REFRESH_RATE/1000f+FuzzyControlAdapter.wheelsSpeed.get(0));
+//            wheelTargetVelocities.set(1, actuation.getY()*REFRESH_RATE/1000f+FuzzyControlAdapter.wheelsSpeed.get(1));
+//            wheelTargetVelocities.set(2, actuation.getZ()*REFRESH_RATE/1000f+FuzzyControlAdapter.wheelsSpeed.get(2));
             
-//            wheelTargetVelocities.set(0, actuation.getX()*REFRESH_RATE/1000f+Comms.wheelsSpeed.get(0));
-//            wheelTargetVelocities.set(1, actuation.getY()*REFRESH_RATE/1000f+Comms.wheelsSpeed.get(1));
-//            wheelTargetVelocities.set(2, actuation.getZ()*REFRESH_RATE/1000f+Comms.wheelsSpeed.get(2));
+            wheelTargetVelocities.set(0, actuation.getX()*REFRESH_RATE/1000f+Comms.wheelsSpeed.get(0));
+            wheelTargetVelocities.set(1, actuation.getY()*REFRESH_RATE/1000f+Comms.wheelsSpeed.get(1));
+            wheelTargetVelocities.set(2, actuation.getZ()*REFRESH_RATE/1000f+Comms.wheelsSpeed.get(2));
            
             
 //            System.out.println("target = "+wheelTargetVelocities); 
@@ -332,14 +351,14 @@ public class FuzzyControl {
                if (abs(wheelTargetVelocities.get(i))>WHEEL_MAX_SPEED){
                    wheelTargetVelocities.set(i,signum(wheelTargetVelocities.get(i))*WHEEL_MAX_SPEED);
                }
-//               switch (i){
-//                   case 0: torque.setX(WHEEL_INERTIA*(wheelTargetVelocities.get(i)-Comms.wheelsSpeed.get(i))/(REFRESH_RATE/1000f));
-//                           break;
-//                   case 1: torque.setY(WHEEL_INERTIA*(wheelTargetVelocities.get(i)-Comms.wheelsSpeed.get(i))/(REFRESH_RATE/1000f));
-//                           break;
-//                   case 2: torque.setZ(WHEEL_INERTIA*(wheelTargetVelocities.get(i)-Comms.wheelsSpeed.get(i))/(REFRESH_RATE/1000f));
-//                           break;
-//               }
+               switch (i){
+                   case 0: torque.setX(WHEEL_INERTIA*(wheelTargetVelocities.get(i)-Comms.wheelsSpeed.get(i))/(REFRESH_RATE/1000f));
+                           break;
+                   case 1: torque.setY(WHEEL_INERTIA*(wheelTargetVelocities.get(i)-Comms.wheelsSpeed.get(i))/(REFRESH_RATE/1000f));
+                           break;
+                   case 2: torque.setZ(WHEEL_INERTIA*(wheelTargetVelocities.get(i)-Comms.wheelsSpeed.get(i))/(REFRESH_RATE/1000f));
+                           break;
+               }
             }
 //            Comms.write42(torque);
 //            System.out.println("commanding wheels");
@@ -416,12 +435,12 @@ public class FuzzyControl {
   
   static boolean desaturationNeeded(){
       for (int i=0;i<3;i++){
-          if (abs(FuzzyControlAdapter.wheelsSpeed.get(i))>0.9*WHEEL_MAX_SPEED){
-              return true;
-          }
-//          if (abs(Comms.wheelsSpeed.get(i))>0.9*WHEEL_MAX_SPEED){
+//          if (abs(FuzzyControlAdapter.wheelsSpeed.get(i))>0.9*WHEEL_MAX_SPEED){
 //              return true;
 //          }
+          if (abs(Comms.wheelsSpeed.get(i))>0.9*WHEEL_MAX_SPEED){
+              return true;
+          }
       }
       return false;
   }
@@ -440,13 +459,13 @@ public class FuzzyControl {
   }
   
   static void checkFilesUpdates(){
-      File scriptFile = new File(System.getProperty("user.dir")+"/fromGround/timeline.js");
-      File FuzzyCPFile = new File(System.getProperty("user.dir")+"/fromGround/Fuzzy_CP.fcl");
-      File FuzzyLCFile = new File(System.getProperty("user.dir")+"/fromGround/Fuzzy_LC.fcl");
-      File FuzzyLEFile = new File(System.getProperty("user.dir")+"/fromGround/Fuzzy_LE.fcl");
+      File scriptFile = new File(System.getProperty("user.dir")+"\\fromGround\\timeline.js");
+      File FuzzyCPFile = new File(System.getProperty("user.dir")+"\\fromGround\\Fuzzy_CP.fcl");
+      File FuzzyLCFile = new File(System.getProperty("user.dir")+"\\fromGround\\Fuzzy_LC.fcl");
+      File FuzzyLEFile = new File(System.getProperty("user.dir")+"\\fromGround\\Fuzzy_LE.fcl");
       
       if (scriptFile.exists()){
-          Path target = Paths.get(System.getProperty("user.dir")+"/timeline.js");
+          Path target = Paths.get(System.getProperty("user.dir")+"\\timeline.js");
           Path source = scriptFile.toPath();
           try {
               Files.move(source, target, REPLACE_EXISTING);
@@ -456,7 +475,7 @@ public class FuzzyControl {
       }
       
       if (FuzzyCPFile.exists()){
-          Path target = Paths.get(System.getProperty("user.dir")+"/Fuzzy_CP.fcl");
+          Path target = Paths.get(System.getProperty("user.dir")+"\\Fuzzy_CP.fcl");
           Path source = FuzzyCPFile.toPath();
           try {
               Files.move(source, target, REPLACE_EXISTING);
@@ -466,7 +485,7 @@ public class FuzzyControl {
       }
       
       if (FuzzyLCFile.exists()){
-          Path target = Paths.get(System.getProperty("user.dir")+"/Fuzzy_LC.fcl");
+          Path target = Paths.get(System.getProperty("user.dir")+"\\Fuzzy_LC.fcl");
           Path source = FuzzyLCFile.toPath();
           try {
               Files.move(source, target, REPLACE_EXISTING);
@@ -476,7 +495,7 @@ public class FuzzyControl {
       }
       
       if (FuzzyLEFile.exists()){
-          Path target = Paths.get(System.getProperty("user.dir")+"/Fuzzy_LE.fcl");
+          Path target = Paths.get(System.getProperty("user.dir")+"\\Fuzzy_LE.fcl");
           Path source = FuzzyLEFile.toPath();
           try {
               Files.move(source, target, REPLACE_EXISTING);
@@ -494,7 +513,7 @@ public class FuzzyControl {
       String line2 = new String();
       ArrayList lines = new ArrayList(2);
       try {
-            BufferedReader br = new BufferedReader(new FileReader("/etc/tle"));
+            BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir")+"\\etc\\tle"));
             int numberOfLines = 0;
             lines.add(br.readLine());
 //            System.out.println("line["+numberOfLines+"] = "+lines.get(numberOfLines)); 
@@ -554,40 +573,13 @@ public class FuzzyControl {
         }            
   }
   
-  static void setiADCSRefreshRate(int RefreshRate){
+  public static void setiADCSRefreshRate(int RefreshRate){
       TIMER.stopLast();
-      TIMER.scheduleTask(new Thread() {
-            @Override 
-            public void run() {
-                try {
-                    if (reconnectionTry > 10) {
-                        Thread.sleep(300000);
-                        reconnectionTry = 0;
-                    }
-//                    Comms.read42();
-                    attitudeTm = connector.getPlatformServices().getAutonomousADCSService().getStatus().getBodyElement0();
-                    OrbitalFrame.nmfSunVector = attitudeTm.getSunVector();
-                    magneticField = attitudeTm.getMagneticField();
-                    angularVelocity = attitudeTm.getAngularVelocity();
-                    FuzzyControlAdapter.setInertialAttitude(attitudeTm.getAttitude());
-                    actuatorsTm = connector.getPlatformServices().getAutonomousADCSService().getStatus().getBodyElement1();
-                    mtqDipoleMoment = actuatorsTm.getMtqDipoleMoment();
-                    FuzzyControlAdapter.wheelsSpeed = actuatorsTm.getCurrentWheelSpeed().getRotationalSpeed();
-                                        
-                    OrbitalFrame.getOrbitalFrame();
-                    currentAttitude = OrbitalFrame.getOrbitalAttitude();
-//                    System.out.println("atitude = "+currentAttitude.toString());
-                    executeControlLoop();
-                    reconnectionTry = 0;
-                } catch (NMFException | IOException | MALInteractionException | MALException ex) {
-                    reconnectionTry++;
-                    Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
-                    log("iADCS not responding");
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }, 5000, RefreshRate, TimeUnit.MILLISECONDS, true);
+      executeMain(RefreshRate, 2000);
+  }
+  
+  public static void switchControlFlag(){
+      controlFlag = !controlFlag;
   }
   
 }

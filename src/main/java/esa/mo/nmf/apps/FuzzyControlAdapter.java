@@ -103,6 +103,7 @@ public class FuzzyControlAdapter extends MonitorAndControlNMFAdapter
   private static final String ACTION_CHANGE_CONTROLLER = "Change_controller";
   private static final String ACTION_SET_PID_GAINS = "Set_PID_gains";
   private static final String ACTION_SET_iADCS_REFRESH_RATE = "Set_iADCS_RefreshRate";
+  private static final String ACTION_SWITCH_CONTROL_FLAG = "Switch_Control_Flag";
   private static final String PARAMETER_ADCS_MODE = "ADCS_ModeOperation";
 //  private static final String PARAMETER_ADCS_DURATION = "ADCS_RemainingControlDuration";
 //  private static final String PARAMETER_ANGULAR_VELOCITY_X = "AngularVelocity_X";
@@ -659,7 +660,15 @@ public class FuzzyControlAdapter extends MonitorAndControlNMFAdapter
         arguments_iADCSRefreshRate  
     );
     actionNames.add(new Identifier(ACTION_SET_iADCS_REFRESH_RATE));
-
+    
+    ActionDefinitionDetails switchControlFlag = new ActionDefinitionDetails(
+        "Toogle on off the control loop",
+        new UOctet((short) 0),
+        new UShort(0),
+        new ArgumentDefinitionDetailsList()  
+    );
+    actionNames.add(new Identifier(ACTION_SWITCH_CONTROL_FLAG));
+    
     actionDefs.add(actionDef1);
     actionDefs.add(actionDef2);
     actionDefs.add(actionDef3);
@@ -673,6 +682,7 @@ public class FuzzyControlAdapter extends MonitorAndControlNMFAdapter
     actionDefs.add(change_controller);
     actionDefs.add(set_PID_Gains);
     actionDefs.add(set_iADCS_RefreshRate);
+    actionDefs.add(switchControlFlag);
     registration.registerActions(actionNames, actionDefs);
   }
 
@@ -688,92 +698,92 @@ public class FuzzyControlAdapter extends MonitorAndControlNMFAdapter
       return null;
     }
       if (TM_PACKET.equals(identifier.getValue()) ){
-//          try {
-              PrintWriter telemetryWriter = new PrintWriter(new FileWriter(FuzzyControl.TELEMETRY_FILE, true));
-              /*System.out.println(nmf.getPlatformServices().getGPSService().getLastKnownPosition().getBodyElement0().toString());
-              GetLastKnownPositionAndVelocityResponse lastKnownPositionAndVelocity = nmf.getPlatformServices().getGPSService().getLastKnownPositionAndVelocity();
-              System.out.println(lastKnownPositionAndVelocity);
-              getDataFieldsFromBestXYZ("a");*/
-              //nmf.pushParameterValue("Time", System.currentTimeMillis()/1000L);
-              
-              telemetryWriter.print(System.currentTimeMillis()/1000L);              
-              
-              Quaternion inertialAttitude = getInertialAttitude();
-              telemetryWriter.format("%13.8f", inertialAttitude.getA());
-              telemetryWriter.format("%13.8f", inertialAttitude.getB());
-              telemetryWriter.format("%13.8f", inertialAttitude.getC());
-              telemetryWriter.format("%13.8f", inertialAttitude.getD());
-              
-              Quaternion currentOrbitalAttitude = OrbitalFrame.getOrbitalAttitude();
-//              nmf.pushParameterValue(PARAMETER_ATTITUDE_Q_A, currentOrbitalAttitude.getA());
-//              nmf.pushParameterValue(PARAMETER_ATTITUDE_Q_B, currentOrbitalAttitude.getB());
-//              nmf.pushParameterValue(PARAMETER_ATTITUDE_Q_C, currentOrbitalAttitude.getC());
-//              nmf.pushParameterValue(PARAMETER_ATTITUDE_Q_D, currentOrbitalAttitude.getD());
-              
-              telemetryWriter.format("%13.8f", currentOrbitalAttitude.getA());
-              telemetryWriter.format("%13.8f", currentOrbitalAttitude.getB());
-              telemetryWriter.format("%13.8f", currentOrbitalAttitude.getC());
-              telemetryWriter.format("%13.8f", currentOrbitalAttitude.getD());
-              
-//              nmf.pushParameterValue(PARAMETER_MAG_X, FuzzyControl.magneticField.getX());
-//              nmf.pushParameterValue(PARAMETER_MAG_Y, FuzzyControl.magneticField.getY());
-//              nmf.pushParameterValue(PARAMETER_MAG_Z, FuzzyControl.magneticField.getZ());
-              
-              telemetryWriter.format("%16.7f", FuzzyControl.magneticField.getX());
-              telemetryWriter.format("%16.7f", FuzzyControl.magneticField.getY());
-              telemetryWriter.format("%16.7f", FuzzyControl.magneticField.getZ()); 
-
-//              nmf.pushParameterValue(PARAMETER_ANGULAR_VELOCITY_X, FuzzyControl.angularVelocity.getX());
-//              nmf.pushParameterValue(PARAMETER_ANGULAR_VELOCITY_Y, FuzzyControl.angularVelocity.getY());
-//              nmf.pushParameterValue(PARAMETER_ANGULAR_VELOCITY_Z, FuzzyControl.angularVelocity.getZ());
-              
-              telemetryWriter.format("%16.7f", FuzzyControl.angularVelocity.getX());
-              telemetryWriter.format("%16.7f", FuzzyControl.angularVelocity.getY());
-              telemetryWriter.format("%16.7f", FuzzyControl.angularVelocity.getZ());
-              
-//              nmf.pushParameterValue(PARAMETER_MTQ_X, mtqDipoleMoment.getX());
-//              nmf.pushParameterValue(PARAMETER_MTQ_Y, mtqDipoleMoment.getY());
-//              nmf.pushParameterValue(PARAMETER_MTQ_Z, mtqDipoleMoment.getZ());
-              
-              telemetryWriter.format("%16.7f", mtqDipoleMoment.getX());
-              telemetryWriter.format("%16.7f", mtqDipoleMoment.getY());
-              telemetryWriter.format("%16.7f", mtqDipoleMoment.getZ());
-
-//              nmf.pushParameterValue("WheelSpeed_X", wheelsSpeed.get(0));
-//              nmf.pushParameterValue("WheelSpeed_Y", wheelsSpeed.get(1));
-//              nmf.pushParameterValue("WheelSpeed_Z", wheelsSpeed.get(2));
-              
-              telemetryWriter.format("%16.7f", wheelsSpeed.get(0));
-              telemetryWriter.format("%16.7f", wheelsSpeed.get(1));
-              telemetryWriter.format("%16.7f", wheelsSpeed.get(2));
-              
-              //nmf.pushParameterValue("Controller_Type", FuzzyControl.controller_type);
-              
-//              nmf.pushParameterValue("Output_Z", FuzzyControl.actuation.getZ());
-//              nmf.pushParameterValue("Output_X", FuzzyControl.actuation.getX());
-//              nmf.pushParameterValue("Output_Y", FuzzyControl.actuation.getY());
-              
-              telemetryWriter.format("%16.7f", FuzzyControl.actuation.getX());
-              telemetryWriter.format("%16.7f", FuzzyControl.actuation.getY());
-              telemetryWriter.format("%16.7f", FuzzyControl.actuation.getZ());
-              
-//              nmf.pushParameterValue("error_X", FuzzyControl.error.getB());
-//              nmf.pushParameterValue("error_Y", FuzzyControl.error.getC());
-//              nmf.pushParameterValue("error_Z", FuzzyControl.error.getD());
-              
-              telemetryWriter.format("%13.8f", FuzzyControl.error.getB());
-              telemetryWriter.format("%13.8f", FuzzyControl.error.getC());
-              telemetryWriter.format("%13.8f", FuzzyControl.error.getD());
-              telemetryWriter.println();
-              
-              telemetryWriter.close();
-                            
-              
+////          try {
+//              PrintWriter telemetryWriter = new PrintWriter(new FileWriter(FuzzyControl.TELEMETRY_FILE, true));
+//              /*System.out.println(nmf.getPlatformServices().getGPSService().getLastKnownPosition().getBodyElement0().toString());
+//              GetLastKnownPositionAndVelocityResponse lastKnownPositionAndVelocity = nmf.getPlatformServices().getGPSService().getLastKnownPositionAndVelocity();
+//              System.out.println(lastKnownPositionAndVelocity);
+//              getDataFieldsFromBestXYZ("a");*/
+//              //nmf.pushParameterValue("Time", System.currentTimeMillis()/1000L);
+//              
+//              telemetryWriter.print(System.currentTimeMillis()/1000L);              
+//              
+//              Quaternion inertialAttitude = getInertialAttitude();
+//              telemetryWriter.format("%13.8f", inertialAttitude.getA());
+//              telemetryWriter.format("%13.8f", inertialAttitude.getB());
+//              telemetryWriter.format("%13.8f", inertialAttitude.getC());
+//              telemetryWriter.format("%13.8f", inertialAttitude.getD());
+//              
+//              Quaternion currentOrbitalAttitude = OrbitalFrame.getOrbitalAttitude();
+////              nmf.pushParameterValue(PARAMETER_ATTITUDE_Q_A, currentOrbitalAttitude.getA());
+////              nmf.pushParameterValue(PARAMETER_ATTITUDE_Q_B, currentOrbitalAttitude.getB());
+////              nmf.pushParameterValue(PARAMETER_ATTITUDE_Q_C, currentOrbitalAttitude.getC());
+////              nmf.pushParameterValue(PARAMETER_ATTITUDE_Q_D, currentOrbitalAttitude.getD());
+//              
+//              telemetryWriter.format("%13.8f", currentOrbitalAttitude.getA());
+//              telemetryWriter.format("%13.8f", currentOrbitalAttitude.getB());
+//              telemetryWriter.format("%13.8f", currentOrbitalAttitude.getC());
+//              telemetryWriter.format("%13.8f", currentOrbitalAttitude.getD());
+//              
+////              nmf.pushParameterValue(PARAMETER_MAG_X, FuzzyControl.magneticField.getX());
+////              nmf.pushParameterValue(PARAMETER_MAG_Y, FuzzyControl.magneticField.getY());
+////              nmf.pushParameterValue(PARAMETER_MAG_Z, FuzzyControl.magneticField.getZ());
+//              
+//              telemetryWriter.format("%16.7f", FuzzyControl.magneticField.getX());
+//              telemetryWriter.format("%16.7f", FuzzyControl.magneticField.getY());
+//              telemetryWriter.format("%16.7f", FuzzyControl.magneticField.getZ()); 
+//
+////              nmf.pushParameterValue(PARAMETER_ANGULAR_VELOCITY_X, FuzzyControl.angularVelocity.getX());
+////              nmf.pushParameterValue(PARAMETER_ANGULAR_VELOCITY_Y, FuzzyControl.angularVelocity.getY());
+////              nmf.pushParameterValue(PARAMETER_ANGULAR_VELOCITY_Z, FuzzyControl.angularVelocity.getZ());
+//              
+//              telemetryWriter.format("%16.7f", FuzzyControl.angularVelocity.getX());
+//              telemetryWriter.format("%16.7f", FuzzyControl.angularVelocity.getY());
+//              telemetryWriter.format("%16.7f", FuzzyControl.angularVelocity.getZ());
+//              
+////              nmf.pushParameterValue(PARAMETER_MTQ_X, mtqDipoleMoment.getX());
+////              nmf.pushParameterValue(PARAMETER_MTQ_Y, mtqDipoleMoment.getY());
+////              nmf.pushParameterValue(PARAMETER_MTQ_Z, mtqDipoleMoment.getZ());
+//              
+//              telemetryWriter.format("%16.7f", mtqDipoleMoment.getX());
+//              telemetryWriter.format("%16.7f", mtqDipoleMoment.getY());
+//              telemetryWriter.format("%16.7f", mtqDipoleMoment.getZ());
+//
+////              nmf.pushParameterValue("WheelSpeed_X", wheelsSpeed.get(0));
+////              nmf.pushParameterValue("WheelSpeed_Y", wheelsSpeed.get(1));
+////              nmf.pushParameterValue("WheelSpeed_Z", wheelsSpeed.get(2));
+//              
+//              telemetryWriter.format("%16.7f", wheelsSpeed.get(0));
+//              telemetryWriter.format("%16.7f", wheelsSpeed.get(1));
+//              telemetryWriter.format("%16.7f", wheelsSpeed.get(2));
+//              
+//              //nmf.pushParameterValue("Controller_Type", FuzzyControl.controller_type);
+//              
+////              nmf.pushParameterValue("Output_Z", FuzzyControl.actuation.getZ());
+////              nmf.pushParameterValue("Output_X", FuzzyControl.actuation.getX());
+////              nmf.pushParameterValue("Output_Y", FuzzyControl.actuation.getY());
+//              
+//              telemetryWriter.format("%16.7f", FuzzyControl.actuation.getX());
+//              telemetryWriter.format("%16.7f", FuzzyControl.actuation.getY());
+//              telemetryWriter.format("%16.7f", FuzzyControl.actuation.getZ());
+//              
+////              nmf.pushParameterValue("error_X", FuzzyControl.error.getB());
+////              nmf.pushParameterValue("error_Y", FuzzyControl.error.getC());
+////              nmf.pushParameterValue("error_Z", FuzzyControl.error.getD());
+//              
+//              telemetryWriter.format("%13.8f", FuzzyControl.error.getB());
+//              telemetryWriter.format("%13.8f", FuzzyControl.error.getC());
+//              telemetryWriter.format("%13.8f", FuzzyControl.error.getD());
+//              telemetryWriter.println();
+//              
+//              telemetryWriter.close();
+//                            
+//              
               return (Attribute) HelperAttributes.javaType2Attribute(true);
-//          } catch (NMFException ex) {
-//              Logger.getLogger(FuzzyControlAdapter.class.getName()).log(Level.SEVERE, null, ex);
-//          }
-          
+////          } catch (NMFException ex) {
+////              Logger.getLogger(FuzzyControlAdapter.class.getName()).log(Level.SEVERE, null, ex);
+////          }
+//          
       } else if (identifier.getValue().equals(PARAMETER_ADCS_MODE)){
           return attitude_operational_mode; 
       } else if (identifier.getValue().equals(PARAMETER_ATTITUDE_Q_A)){
@@ -944,6 +954,10 @@ public class FuzzyControlAdapter extends MonitorAndControlNMFAdapter
             break;
         case ACTION_SET_iADCS_REFRESH_RATE:
             FuzzyControl.setiADCSRefreshRate(Integer.parseInt(attributeValues.get(0).getValue().toString()));
+            break;
+        case ACTION_SWITCH_CONTROL_FLAG:
+            FuzzyControl.switchControlFlag();
+            break;
         default:
           break;
       }
