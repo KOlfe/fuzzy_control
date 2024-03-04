@@ -76,7 +76,8 @@ public class OrbitalFrame {
 //        }
 //
         //AbsoluteDate OS_date = new AbsoluteDate(AbsoluteDate.JAVA_EPOCH, ((double)System.currentTimeMillis())/1000.0 - elapsed_time, TimeScalesFactory.getUTC());
-        AbsoluteDate OS_date = new AbsoluteDate(AbsoluteDate.JAVA_EPOCH, ((double)System.currentTimeMillis())/1000.0, TimeScalesFactory.getUTC());
+//        AbsoluteDate OS_date = new AbsoluteDate(AbsoluteDate.JAVA_EPOCH, ((double)System.currentTimeMillis())/1000.0, TimeScalesFactory.getUTC());
+        AbsoluteDate OS_date = Comms.simDateTime;
 //System.out.println("Date = "+OS_date);
 ////    
 ////        Calendar cal = Calendar.getInstance();

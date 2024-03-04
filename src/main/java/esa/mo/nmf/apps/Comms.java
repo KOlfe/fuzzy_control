@@ -10,12 +10,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ccsds.moims.mo.mal.structures.FloatList;
 import org.ccsds.moims.mo.platform.autonomousadcs.structures.Quaternion;
 import org.ccsds.moims.mo.platform.structures.VectorF3D;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
+import org.orekit.time.AbsoluteDate;
+import org.orekit.time.DateComponents;
+import org.orekit.time.TimeComponents;
+import org.orekit.time.TimeScalesFactory;
 
 /**
  *
@@ -31,6 +36,7 @@ public static Quaternion inertialAttitude = new Quaternion();
 public static FloatList wheelsSpeed = new FloatList(3);
 public static VectorF3D m = new VectorF3D(0.0f, 0.0f, 0.0f);
 public static VectorF3D B = new VectorF3D();
+public static AbsoluteDate simDateTime;
 
 public static void initComms(){
     wheelsSpeed.add(0.0f);
@@ -50,7 +56,7 @@ public static void read42(){
     try {
         String line;
         line = in.readLine();
-//        System.out.println(line);
+        parseDateandTime(line);
         line = in.readLine();
 //        String pos[] = line.split(" ");
 //        Vector3D PosN = new Vector3D(Double.parseDouble(pos[2]), Double.parseDouble(pos[3]), Double.parseDouble(pos[4])); 
@@ -108,5 +114,19 @@ static void write42(VectorF3D torque){
         Logger.getLogger(Comms.class.getName()).log(Level.SEVERE, null, ex);
     }
 }
+
+private static void parseDateandTime(String line){
+//    System.out.println("line : "+Arrays.toString(line.split(" ")));
+    String[] dateMinSecond = line.split(" ")[1].split(":");
+//    System.out.println("hour : "+Arrays.toString(dateMinSecond));
+    String[] yearDoyHour =  dateMinSecond[0].split("-");
+//    System.out.println("day : "+Arrays.toString(yearDoyHour));
+    DateComponents simDate = new DateComponents(Integer.parseInt(yearDoyHour[0]),Integer.parseInt(yearDoyHour[1]));
+//    System.out.println("date : "+simDate.toString());
+    TimeComponents simTime = new TimeComponents(Integer.parseInt(yearDoyHour[2]),Integer.parseInt(dateMinSecond[1]), Double.parseDouble(dateMinSecond[2]));
+//    System.out.println("time : "+simTime.toString());
+    simDateTime = new AbsoluteDate(simDate, simTime, TimeScalesFactory.getUTC()); 
+    System.out.println("output : "+simDateTime.toString());
+} 
     
 }

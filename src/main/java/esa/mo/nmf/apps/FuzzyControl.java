@@ -72,7 +72,7 @@ import org.orekit.propagation.analytical.tle.TLE;
 public class FuzzyControl {
     static final NanoSatMOConnectorImpl connector = new NanoSatMOConnectorImpl();
     static final TaskScheduler TIMER = new TaskScheduler(1);
-    protected static final int REFRESH_RATE =2000;
+    protected static final int REFRESH_RATE =200;
     static Quaternion currentAttitude = new Quaternion();
     private static Quaternion targetAttitude = new Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
     static Quaternion error = new Quaternion();
@@ -92,10 +92,10 @@ public class FuzzyControl {
     static final Float WHEEL_MAX_SPEED = (float)(0.8*10000.0*PI/30.0) ;
     static final Float WHEEL_MAX_TORQUE = (float)(0.8e-4) ;
     static final Float WHEEL_INERTIA = (float)(1.5465e-6) ;
+    static final File TELEMETRY_FILE = new File (System.getProperty("user.dir")+"/toGroundLP/TM_"+String.valueOf(System.currentTimeMillis())+".dat");
+    static final File LOG_FILE = new File (System.getProperty("user.dir")+"/toGround/log_"+String.valueOf(System.currentTimeMillis())+".txt");
 //    static final File TELEMETRY_FILE = new File (System.getProperty("user.dir")+"/toGroundLP/TM_"+String.valueOf(System.currentTimeMillis())+".dat");
 //    static final File LOG_FILE = new File (System.getProperty("user.dir")+"/toGround/log_"+String.valueOf(System.currentTimeMillis())+".txt");
-    static final File TELEMETRY_FILE = new File (System.getProperty("user.dir")+"\\toGroundLP\\TM_"+String.valueOf(System.currentTimeMillis())+".dat");
-    static final File LOG_FILE = new File (System.getProperty("user.dir")+"\\toGround\\log_"+String.valueOf(System.currentTimeMillis())+".txt");
     static FuzzyControlAdapter adapter;
     static AttitudeTelemetry attitudeTm;
     static ActuatorsTelemetry actuatorsTm;
@@ -151,28 +151,28 @@ public class FuzzyControl {
         
         TIMELINE_EXECUTOR.start();
         
-        executeMain(REFRESH_RATE, 5000);                                                                         
+//        executeMain(REFRESH_RATE, 5000);                                                                         
+        executeMain(200, 5000); 
     
-    
-        TIMER.scheduleTask(new Thread() {
-            @Override
-            public void run() {
-        Comms.read42();
-        Comms.write42(torque);
-    }
-    }, 0, 200, TimeUnit.MILLISECONDS, true); 
+//        TIMER.scheduleTask(new Thread() {
+//            @Override
+//            public void run() {
+//        Comms.read42();
+//        Comms.write42(torque);
+//    }
+//    }, 0, 200, TimeUnit.MILLISECONDS, true); 
     }
     
     static void executeMain(int refreshRate, int initialDelay){
         TIMER.scheduleTask(new Thread() {
             @Override 
             public void run() {
-                try {
-                    if (reconnectionTry > 10) {
-                        Thread.sleep(300000);
-                        reconnectionTry = 0;
-                    }
-//                    Comms.read42();
+//                try {
+//                    if (reconnectionTry > 10) {
+//                        Thread.sleep(300000);
+//                        reconnectionTry = 0;
+//                    }
+                    Comms.read42();
 //                    attitudeTm = connector.getPlatformServices().getAutonomousADCSService().getStatus().getBodyElement0();
 //                    OrbitalFrame.nmfSunVector = attitudeTm.getSunVector();
 //                    magneticField = attitudeTm.getMagneticField();
@@ -186,17 +186,18 @@ public class FuzzyControl {
                     currentAttitude = OrbitalFrame.getOrbitalAttitude();
 //                    System.out.println("atitude = "+currentAttitude.toString());
                     if (controlFlag){
-                        executeControlLoop();    
+                        executeControlLoop();
+                        Comms.write42(torque);
                     }
                     reconnectionTry = 0;
                     Util.writeTelemtry();
 //                } catch (NMFException | IOException | MALInteractionException | MALException ex) {
-                    reconnectionTry++;
+//                    reconnectionTry++;
+////                    Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
+//                    log("iADCS not responding");
+//                } catch (InterruptedException ex) {
 //                    Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
-                    log("iADCS not responding");
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
-                }
+//                }
             }
         }, initialDelay, refreshRate, TimeUnit.MILLISECONDS, true);        
     }
@@ -308,10 +309,14 @@ public class FuzzyControl {
                 actuation.setZ((float)1.0*signum(actuation.getZ()));
             }
              
-            //actuation in torque
-            torque.setX(actuation.getX()*WHEEL_MAX_TORQUE);
-            torque.setY(actuation.getY()*WHEEL_MAX_TORQUE);
-            torque.setZ(actuation.getZ()*WHEEL_MAX_TORQUE);
+            //actuation in torque with 10% of whell comand error
+            torque.setX(actuation.getX()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
+            torque.setY(actuation.getY()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
+            torque.setZ(actuation.getZ()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
+            //Nominal actuation in torque
+//            torque.setX(actuation.getX()*WHEEL_MAX_TORQUE);
+//            torque.setY(actuation.getY()*WHEEL_MAX_TORQUE);
+//            torque.setZ(actuation.getZ()*WHEEL_MAX_TORQUE);
 //            System.out.println("torque commanded ="+torque);
             
             
@@ -459,13 +464,13 @@ public class FuzzyControl {
   }
   
   static void checkFilesUpdates(){
-      File scriptFile = new File(System.getProperty("user.dir")+"\\fromGround\\timeline.js");
-      File FuzzyCPFile = new File(System.getProperty("user.dir")+"\\fromGround\\Fuzzy_CP.fcl");
-      File FuzzyLCFile = new File(System.getProperty("user.dir")+"\\fromGround\\Fuzzy_LC.fcl");
-      File FuzzyLEFile = new File(System.getProperty("user.dir")+"\\fromGround\\Fuzzy_LE.fcl");
+      File scriptFile = new File(System.getProperty("user.dir")+"/fromGround/timeline.js");
+      File FuzzyCPFile = new File(System.getProperty("user.dir")+"/fromGround/Fuzzy_CP.fcl");
+      File FuzzyLCFile = new File(System.getProperty("user.dir")+"/fromGround/Fuzzy_LC.fcl");
+      File FuzzyLEFile = new File(System.getProperty("user.dir")+"/fromGround/Fuzzy_LE.fcl");
       
       if (scriptFile.exists()){
-          Path target = Paths.get(System.getProperty("user.dir")+"\\timeline.js");
+          Path target = Paths.get(System.getProperty("user.dir")+"/timeline.js");
           Path source = scriptFile.toPath();
           try {
               Files.move(source, target, REPLACE_EXISTING);
@@ -475,7 +480,7 @@ public class FuzzyControl {
       }
       
       if (FuzzyCPFile.exists()){
-          Path target = Paths.get(System.getProperty("user.dir")+"\\Fuzzy_CP.fcl");
+          Path target = Paths.get(System.getProperty("user.dir")+"/Fuzzy_CP.fcl");
           Path source = FuzzyCPFile.toPath();
           try {
               Files.move(source, target, REPLACE_EXISTING);
@@ -485,7 +490,7 @@ public class FuzzyControl {
       }
       
       if (FuzzyLCFile.exists()){
-          Path target = Paths.get(System.getProperty("user.dir")+"\\Fuzzy_LC.fcl");
+          Path target = Paths.get(System.getProperty("user.dir")+"/Fuzzy_LC.fcl");
           Path source = FuzzyLCFile.toPath();
           try {
               Files.move(source, target, REPLACE_EXISTING);
@@ -495,7 +500,7 @@ public class FuzzyControl {
       }
       
       if (FuzzyLEFile.exists()){
-          Path target = Paths.get(System.getProperty("user.dir")+"\\Fuzzy_LE.fcl");
+          Path target = Paths.get(System.getProperty("user.dir")+"/Fuzzy_LE.fcl");
           Path source = FuzzyLEFile.toPath();
           try {
               Files.move(source, target, REPLACE_EXISTING);
@@ -513,7 +518,7 @@ public class FuzzyControl {
       String line2 = new String();
       ArrayList lines = new ArrayList(2);
       try {
-            BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir")+"\\etc\\tle"));
+            BufferedReader br = new BufferedReader(new FileReader("/etc/tle"));
             int numberOfLines = 0;
             lines.add(br.readLine());
 //            System.out.println("line["+numberOfLines+"] = "+lines.get(numberOfLines)); 
@@ -535,7 +540,8 @@ public class FuzzyControl {
             if (TLE.isFormatOK(line1, line2)){
                 log("TLE line 1 = "+line1);
                 log("TLE line 2 = "+line2);
-                OrbitalFrame.opsSatTLE = new TLE(line1, line2);    
+                OrbitalFrame.opsSatTLE = new TLE(line1, line2); 
+                System.out.println(OrbitalFrame.opsSatTLE.getDate().toString());
             }
             
       } catch (IOException ex) {

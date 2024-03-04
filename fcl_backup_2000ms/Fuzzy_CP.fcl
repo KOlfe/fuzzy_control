@@ -1,0 +1,320 @@
+//FIS Central
+
+FUNCTION_BLOCK Y_axis
+
+// Define input variables
+VAR_INPUT
+    Error : REAL;
+    Error_derivative : REAL;
+END_VAR
+
+// Define output variables
+VAR_OUTPUT
+    Actuation : REAL;
+END_VAR
+
+// Fuzzify input variable 'Error'
+FUZZIFY Error
+    TERM NB := (-9999.0, 0) (-9998.0, 1) (-0.194198164787397, 1) (-0.194198164787397, 0);
+    TERM N := (-0.194198164787397, 0) (-0.194198164787397, 1) (-0.085152570401242, 1) (-0.085152570401242, 0);
+    TERM NS := (-0.085152570401242, 0) (-0.085152570401242, 1) (-0.0210578404118119, 1) (-0.0005, 0);
+    TERM Z := (-0.0210578404118119, 0) (-0.0005, 1) (0.0005, 1) (0.0210578404118119, 0);
+    TERM PS := (0.0005, 0) (0.0210578404118119, 1) (0.085152570401242, 1) (0.085152570401242, 0);
+    TERM P := (0.085152570401242, 0) (0.085152570401242, 1) (0.194198164787397, 1) (0.194198164787397, 0);
+    TERM PB := (0.194198164787397, 0) (0.194198164787397, 1) (9998.0, 1) (9999.0, 0);
+END_FUZZIFY
+
+// Fuzzify input variable 'Error_derivative'
+FUZZIFY Error_derivative
+    TERM NB := (-9999.0, 0) (-9998.0, 1) (-0.00895674747880061, 1) (-0.00895674747880061, 0);
+    TERM N := (-0.00895674747880061, 0) (-0.00895674747880061, 1) (-0.00266368174910117, 1) (-0.00266368174910117, 0);
+    TERM NS := (-0.00266368174910117, 0) (-0.00266368174910117, 1) (-0.000766458634137864, 1) (-5e-06, 0);
+    TERM Z := (-0.000766458634137864, 0) (-5e-06, 1) (5e-06, 1) (0.000766458634137864, 0);
+    TERM PS := (5e-06, 0) (0.000766458634137864, 1) (0.00266368174910117, 1) (0.00266368174910117, 0);
+    TERM P := (0.00266368174910117, 0) (0.00266368174910117, 1) (0.00895674747880061, 1) (0.00895674747880061, 0);
+    TERM PB := (0.00895674747880061, 0) (0.00895674747880061, 1) (9998.0, 1) (9999.0, 0);
+END_FUZZIFY
+
+// Defuzzify output variable 'Actuation'
+DEFUZZIFY Actuation
+    TERM NB := -1.0;
+    TERM NS := -0.25;
+    TERM Z := 0.0;
+    TERM PS := 0.25;
+    TERM PB := 1.0;
+
+    METHOD : COGS;
+    DEFAULT := 0.0;
+END_DEFUZZIFY
+
+RULEBLOCK No1
+
+    AND : PROD;
+    ACT : PROD;
+    ACCU : NSUM;
+
+    RULE 1 : IF  Error IS NB AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 2 : IF  Error IS NB AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 3 : IF  Error IS NB AND Error_derivative IS NS THEN Actuation IS PB WITH 1.0;
+    RULE 4 : IF  Error IS NB AND Error_derivative IS Z THEN Actuation IS PB WITH 1.0;
+    RULE 5 : IF  Error IS NB AND Error_derivative IS PS THEN Actuation IS PB WITH 1.0;
+    RULE 6 : IF  Error IS NB AND Error_derivative IS P THEN Actuation IS PB WITH 1.0;
+    RULE 7 : IF  Error IS NB AND Error_derivative IS PB THEN Actuation IS Z WITH 1.0;
+    RULE 8 : IF  Error IS N AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 9 : IF  Error IS N AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 10 : IF  Error IS N AND Error_derivative IS NS THEN Actuation IS PB WITH 1.0;
+    RULE 11 : IF  Error IS N AND Error_derivative IS Z THEN Actuation IS PB WITH 1.0;
+    RULE 12 : IF  Error IS N AND Error_derivative IS PS THEN Actuation IS PB WITH 1.0;
+    RULE 13 : IF  Error IS N AND Error_derivative IS P THEN Actuation IS Z WITH 1.0;
+    RULE 14 : IF  Error IS N AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 15 : IF  Error IS NS AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 16 : IF  Error IS NS AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 17 : IF  Error IS NS AND Error_derivative IS NS THEN Actuation IS PB WITH 1.0;
+    RULE 18 : IF  Error IS NS AND Error_derivative IS Z THEN Actuation IS PS WITH 1.0;
+    RULE 19 : IF  Error IS NS AND Error_derivative IS PS THEN Actuation IS Z WITH 1.0;
+    RULE 20 : IF  Error IS NS AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 21 : IF  Error IS NS AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 22 : IF  Error IS Z AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 23 : IF  Error IS Z AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 24 : IF  Error IS Z AND Error_derivative IS NS THEN Actuation IS PS WITH 1.0;
+    RULE 25 : IF  Error IS Z AND Error_derivative IS Z THEN Actuation IS Z WITH 1.0;
+    RULE 26 : IF  Error IS Z AND Error_derivative IS PS THEN Actuation IS NS WITH 1.0;
+    RULE 27 : IF  Error IS Z AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 28 : IF  Error IS Z AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 29 : IF  Error IS PS AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 30 : IF  Error IS PS AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 31 : IF  Error IS PS AND Error_derivative IS NS THEN Actuation IS Z WITH 1.0;
+    RULE 32 : IF  Error IS PS AND Error_derivative IS Z THEN Actuation IS NS WITH 1.0;
+    RULE 33 : IF  Error IS PS AND Error_derivative IS PS THEN Actuation IS NB WITH 1.0;
+    RULE 34 : IF  Error IS PS AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 35 : IF  Error IS PS AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 36 : IF  Error IS P AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 37 : IF  Error IS P AND Error_derivative IS N THEN Actuation IS Z WITH 1.0;
+    RULE 38 : IF  Error IS P AND Error_derivative IS NS THEN Actuation IS NB WITH 1.0;
+    RULE 39 : IF  Error IS P AND Error_derivative IS Z THEN Actuation IS NB WITH 1.0;
+    RULE 40 : IF  Error IS P AND Error_derivative IS PS THEN Actuation IS NB WITH 1.0;
+    RULE 41 : IF  Error IS P AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 42 : IF  Error IS P AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 43 : IF  Error IS PB AND Error_derivative IS NB THEN Actuation IS Z WITH 1.0;
+    RULE 44 : IF  Error IS PB AND Error_derivative IS N THEN Actuation IS NB WITH 1.0;
+    RULE 45 : IF  Error IS PB AND Error_derivative IS NS THEN Actuation IS NB WITH 1.0;
+    RULE 46 : IF  Error IS PB AND Error_derivative IS Z THEN Actuation IS NB WITH 1.0;
+    RULE 47 : IF  Error IS PB AND Error_derivative IS PS THEN Actuation IS NB WITH 1.0;
+    RULE 48 : IF  Error IS PB AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 49 : IF  Error IS PB AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
+
+
+FUNCTION_BLOCK X_axis
+
+// Define input variables
+VAR_INPUT
+    Error : REAL;
+    Error_derivative : REAL;
+END_VAR
+
+// Define output variables
+VAR_OUTPUT
+    Actuation : REAL;
+END_VAR
+
+// Fuzzify input variable 'Error'
+FUZZIFY Error
+    TERM NB := (-9999.0, 0) (-9998.0, 1) (-0.0924568985546373, 1) (-0.0924568985546373, 0);
+    TERM N := (-0.0924568985546373, 0) (-0.0924568985546373, 1) (-0.0847831898621891, 1) (-0.0847831898621891, 0);
+    TERM NS := (-0.0847831898621891, 0) (-0.0847831898621891, 1) (-0.065435656414773, 1) (-0.0005, 0);
+    TERM Z := (-0.065435656414773, 0) (-0.0005, 1) (0.0005, 1) (0.065435656414773, 0);
+    TERM PS := (0.0005, 0) (0.065435656414773, 1) (0.0847831898621891, 1) (0.0847831898621891, 0);
+    TERM P := (0.0847831898621891, 0) (0.0847831898621891, 1) (0.0924568985546373, 1) (0.0924568985546373, 0);
+    TERM PB := (0.0924568985546373, 0) (0.0924568985546373, 1) (9998.0, 1) (9999.0, 0);
+END_FUZZIFY
+
+// Fuzzify input variable 'Error_derivative'
+FUZZIFY Error_derivative
+    TERM NB := (-9999.0, 0) (-9998.0, 1) (-0.0111879135915264, 1) (-0.0111879135915264, 0);
+    TERM N := (-0.0111879135915264, 0) (-0.0111879135915264, 1) (-0.00416346573276782, 1) (-0.00416346573276782, 0);
+    TERM NS := (-0.00416346573276782, 0) (-0.00416346573276782, 1) (-0.00126383998291327, 1) (-5e-06, 0);
+    TERM Z := (-0.00126383998291327, 0) (-5e-06, 1) (5e-06, 1) (0.00126383998291327, 0);
+    TERM PS := (5e-06, 0) (0.00126383998291327, 1) (0.00416346573276782, 1) (0.00416346573276782, 0);
+    TERM P := (0.00416346573276782, 0) (0.00416346573276782, 1) (0.0111879135915264, 1) (0.0111879135915264, 0);
+    TERM PB := (0.0111879135915264, 0) (0.0111879135915264, 1) (9998.0, 1) (9999.0, 0);
+END_FUZZIFY
+
+// Defuzzify output variable 'Actuation'
+DEFUZZIFY Actuation
+    TERM NB := -1.0;
+    TERM NS := -0.25;
+    TERM Z := 0.0;
+    TERM PS := 0.25;
+    TERM PB := 1.0;
+
+    METHOD : COGS;
+    DEFAULT := 0.0;
+END_DEFUZZIFY
+
+RULEBLOCK No1
+// Use 'MIN' for 'AND' (also implicit use 'MAX' for 'or' to fulfill DeMorgan's Law)
+    AND : PROD;
+    ACT : PROD;
+    ACCU : NSUM;
+
+    RULE 1 : IF  Error IS NB AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 2 : IF  Error IS NB AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 3 : IF  Error IS NB AND Error_derivative IS NS THEN Actuation IS PB WITH 1.0;
+    RULE 4 : IF  Error IS NB AND Error_derivative IS Z THEN Actuation IS PB WITH 1.0;
+    RULE 5 : IF  Error IS NB AND Error_derivative IS PS THEN Actuation IS PB WITH 1.0;
+    RULE 6 : IF  Error IS NB AND Error_derivative IS P THEN Actuation IS PB WITH 1.0;
+    RULE 7 : IF  Error IS NB AND Error_derivative IS PB THEN Actuation IS Z WITH 1.0;
+    RULE 8 : IF  Error IS N AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 9 : IF  Error IS N AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 10 : IF  Error IS N AND Error_derivative IS NS THEN Actuation IS PB WITH 1.0;
+    RULE 11 : IF  Error IS N AND Error_derivative IS Z THEN Actuation IS PB WITH 1.0;
+    RULE 12 : IF  Error IS N AND Error_derivative IS PS THEN Actuation IS PB WITH 1.0;
+    RULE 13 : IF  Error IS N AND Error_derivative IS P THEN Actuation IS Z WITH 1.0;
+    RULE 14 : IF  Error IS N AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 15 : IF  Error IS NS AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 16 : IF  Error IS NS AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 17 : IF  Error IS NS AND Error_derivative IS NS THEN Actuation IS PB WITH 1.0;
+    RULE 18 : IF  Error IS NS AND Error_derivative IS Z THEN Actuation IS PS WITH 1.0;
+    RULE 19 : IF  Error IS NS AND Error_derivative IS PS THEN Actuation IS Z WITH 1.0;
+    RULE 20 : IF  Error IS NS AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 21 : IF  Error IS NS AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 22 : IF  Error IS Z AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 23 : IF  Error IS Z AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 24 : IF  Error IS Z AND Error_derivative IS NS THEN Actuation IS PS WITH 1.0;
+    RULE 25 : IF  Error IS Z AND Error_derivative IS Z THEN Actuation IS Z WITH 1.0;
+    RULE 26 : IF  Error IS Z AND Error_derivative IS PS THEN Actuation IS NS WITH 1.0;
+    RULE 27 : IF  Error IS Z AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 28 : IF  Error IS Z AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 29 : IF  Error IS PS AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 30 : IF  Error IS PS AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 31 : IF  Error IS PS AND Error_derivative IS NS THEN Actuation IS Z WITH 1.0;
+    RULE 32 : IF  Error IS PS AND Error_derivative IS Z THEN Actuation IS NS WITH 1.0;
+    RULE 33 : IF  Error IS PS AND Error_derivative IS PS THEN Actuation IS NB WITH 1.0;
+    RULE 34 : IF  Error IS PS AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 35 : IF  Error IS PS AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 36 : IF  Error IS P AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 37 : IF  Error IS P AND Error_derivative IS N THEN Actuation IS Z WITH 1.0;
+    RULE 38 : IF  Error IS P AND Error_derivative IS NS THEN Actuation IS NB WITH 1.0;
+    RULE 39 : IF  Error IS P AND Error_derivative IS Z THEN Actuation IS NB WITH 1.0;
+    RULE 40 : IF  Error IS P AND Error_derivative IS PS THEN Actuation IS NB WITH 1.0;
+    RULE 41 : IF  Error IS P AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 42 : IF  Error IS P AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 43 : IF  Error IS PB AND Error_derivative IS NB THEN Actuation IS Z WITH 1.0;
+    RULE 44 : IF  Error IS PB AND Error_derivative IS N THEN Actuation IS NB WITH 1.0;
+    RULE 45 : IF  Error IS PB AND Error_derivative IS NS THEN Actuation IS NB WITH 1.0;
+    RULE 46 : IF  Error IS PB AND Error_derivative IS Z THEN Actuation IS NB WITH 1.0;
+    RULE 47 : IF  Error IS PB AND Error_derivative IS PS THEN Actuation IS NB WITH 1.0;
+    RULE 48 : IF  Error IS PB AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 49 : IF  Error IS PB AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
+
+
+FUNCTION_BLOCK Z_axis
+
+// Define input variables
+VAR_INPUT
+    Error : REAL;
+    Error_derivative : REAL;
+END_VAR
+
+// Define output variables
+VAR_OUTPUT
+    Actuation : REAL;
+END_VAR
+
+// Fuzzify input variable 'Error'
+FUZZIFY Error
+    TERM NB := (-9999.0, 0) (-9998.0, 1) (-0.139437467259784, 1) (-0.139437467259784, 0);
+    TERM N := (-0.139437467259784, 0) (-0.139437467259784, 1) (-0.0861717926972084, 1) (-0.0861717926972084, 0);
+    TERM NS := (-0.0861717926972084, 0) (-0.0861717926972084, 1) (-0.0513532071934642, 1) (-0.0005, 0);
+    TERM Z := (-0.0513532071934642, 0) (-0.0005, 1) (0.0005, 1) (0.0513532071934642, 0);
+    TERM PS := (0.0005, 0) (0.0513532071934642, 1) (0.0861717926972084, 1) (0.0861717926972084, 0);
+    TERM P := (0.0861717926972084, 0) (0.0861717926972084, 1) (0.139437467259784, 1) (0.139437467259784, 0);
+    TERM PB := (0.139437467259784, 0) (0.139437467259784, 1) (9998.0, 1) (9999.0, 0);
+END_FUZZIFY
+
+// Fuzzify input variable 'Error_derivative'
+FUZZIFY Error_derivative
+    TERM NB := (-9999.0, 0) (-9998.0, 1) (-0.0154552465289573, 1) (-0.0154552465289573, 0);
+    TERM N := (-0.0154552465289573, 0) (-0.0154552465289573, 1) (-0.00639992441689391, 1) (-0.00639992441689391, 0);
+    TERM NS := (-0.00639992441689391, 0) (-0.00639992441689391, 1) (-0.00298892520874269, 1) (-5e-06, 0);
+    TERM Z := (-0.00298892520874269, 0) (-5e-06, 1) (5e-06, 1) (0.00298892520874269, 0);
+    TERM PS := (5e-06, 0) (0.00298892520874269, 1) (0.00639992441689391, 1) (0.00639992441689391, 0);
+    TERM P := (0.00639992441689391, 0) (0.00639992441689391, 1) (0.0154552465289573, 1) (0.0154552465289573, 0);
+    TERM PB := (0.0154552465289573, 0) (0.0154552465289573, 1) (9998.0, 1) (9999.0, 0);
+END_FUZZIFY
+
+// Defuzzify output variable 'Actuation'
+DEFUZZIFY Actuation
+    TERM NB := -1.0;
+    TERM NS := -0.25;
+    TERM Z := 0.0;
+    TERM PS := 0.25;
+    TERM PB := 1.0;
+
+    METHOD : COGS;
+    DEFAULT := 0.0;
+END_DEFUZZIFY
+
+RULEBLOCK No1
+    AND : PROD;
+    ACT : PROD;
+    ACCU : NSUM;
+
+    RULE 1 : IF  Error IS NB AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 2 : IF  Error IS NB AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 3 : IF  Error IS NB AND Error_derivative IS NS THEN Actuation IS PB WITH 1.0;
+    RULE 4 : IF  Error IS NB AND Error_derivative IS Z THEN Actuation IS PB WITH 1.0;
+    RULE 5 : IF  Error IS NB AND Error_derivative IS PS THEN Actuation IS PB WITH 1.0;
+    RULE 6 : IF  Error IS NB AND Error_derivative IS P THEN Actuation IS PB WITH 1.0;
+    RULE 7 : IF  Error IS NB AND Error_derivative IS PB THEN Actuation IS Z WITH 1.0;
+    RULE 8 : IF  Error IS N AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 9 : IF  Error IS N AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 10 : IF  Error IS N AND Error_derivative IS NS THEN Actuation IS PB WITH 1.0;
+    RULE 11 : IF  Error IS N AND Error_derivative IS Z THEN Actuation IS PB WITH 1.0;
+    RULE 12 : IF  Error IS N AND Error_derivative IS PS THEN Actuation IS PB WITH 1.0;
+    RULE 13 : IF  Error IS N AND Error_derivative IS P THEN Actuation IS Z WITH 1.0;
+    RULE 14 : IF  Error IS N AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 15 : IF  Error IS NS AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 16 : IF  Error IS NS AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 17 : IF  Error IS NS AND Error_derivative IS NS THEN Actuation IS PB WITH 1.0;
+    RULE 18 : IF  Error IS NS AND Error_derivative IS Z THEN Actuation IS PS WITH 1.0;
+    RULE 19 : IF  Error IS NS AND Error_derivative IS PS THEN Actuation IS Z WITH 1.0;
+    RULE 20 : IF  Error IS NS AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 21 : IF  Error IS NS AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 22 : IF  Error IS Z AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 23 : IF  Error IS Z AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 24 : IF  Error IS Z AND Error_derivative IS NS THEN Actuation IS PS WITH 1.0;
+    RULE 25 : IF  Error IS Z AND Error_derivative IS Z THEN Actuation IS Z WITH 1.0;
+    RULE 26 : IF  Error IS Z AND Error_derivative IS PS THEN Actuation IS NS WITH 1.0;
+    RULE 27 : IF  Error IS Z AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 28 : IF  Error IS Z AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 29 : IF  Error IS PS AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 30 : IF  Error IS PS AND Error_derivative IS N THEN Actuation IS PB WITH 1.0;
+    RULE 31 : IF  Error IS PS AND Error_derivative IS NS THEN Actuation IS Z WITH 1.0;
+    RULE 32 : IF  Error IS PS AND Error_derivative IS Z THEN Actuation IS NS WITH 1.0;
+    RULE 33 : IF  Error IS PS AND Error_derivative IS PS THEN Actuation IS NB WITH 1.0;
+    RULE 34 : IF  Error IS PS AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 35 : IF  Error IS PS AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 36 : IF  Error IS P AND Error_derivative IS NB THEN Actuation IS PB WITH 1.0;
+    RULE 37 : IF  Error IS P AND Error_derivative IS N THEN Actuation IS Z WITH 1.0;
+    RULE 38 : IF  Error IS P AND Error_derivative IS NS THEN Actuation IS NB WITH 1.0;
+    RULE 39 : IF  Error IS P AND Error_derivative IS Z THEN Actuation IS NB WITH 1.0;
+    RULE 40 : IF  Error IS P AND Error_derivative IS PS THEN Actuation IS NB WITH 1.0;
+    RULE 41 : IF  Error IS P AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 42 : IF  Error IS P AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+    RULE 43 : IF  Error IS PB AND Error_derivative IS NB THEN Actuation IS Z WITH 1.0;
+    RULE 44 : IF  Error IS PB AND Error_derivative IS N THEN Actuation IS NB WITH 1.0;
+    RULE 45 : IF  Error IS PB AND Error_derivative IS NS THEN Actuation IS NB WITH 1.0;
+    RULE 46 : IF  Error IS PB AND Error_derivative IS Z THEN Actuation IS NB WITH 1.0;
+    RULE 47 : IF  Error IS PB AND Error_derivative IS PS THEN Actuation IS NB WITH 1.0;
+    RULE 48 : IF  Error IS PB AND Error_derivative IS P THEN Actuation IS NB WITH 1.0;
+    RULE 49 : IF  Error IS PB AND Error_derivative IS PB THEN Actuation IS NB WITH 1.0;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK

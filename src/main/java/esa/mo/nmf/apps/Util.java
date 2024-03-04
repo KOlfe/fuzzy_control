@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import org.ccsds.moims.mo.platform.structures.VectorF3D;
 import org.orekit.data.DataProvidersManager;
 import org.orekit.data.DirectoryCrawler;
+import org.orekit.time.AbsoluteDate;
 
 /**
  *
@@ -96,26 +97,26 @@ public class Util {
     
     static void initOrekitFiles(){
         try {
-//            File orekitResourcesFileInitLocation = new File("/home/nmf/lib/orekit-resources-2.1.0-SNAPSHOT.jar");
-//            File orekitResourcesFileFinalLocation = new File(System.getProperty("user.dir")+"/orekit-resources-2.1.0-SNAPSHOT.jar");
-//            File orekitDataCompressedFile = new File(System.getProperty("user.dir")+"/orekit-data.zip");
+            File orekitResourcesFileInitLocation = new File("/home/nmf/lib/orekit-resources-2.1.0-SNAPSHOT.jar");
+            File orekitResourcesFileFinalLocation = new File(System.getProperty("user.dir")+"/orekit-resources-2.1.0-SNAPSHOT.jar");
+            File orekitDataCompressedFile = new File(System.getProperty("user.dir")+"/orekit-data.zip");
             File orekitData = new File(System.getProperty("user.dir")+"/orekit-data");
-//            
-//            
-//            if (orekitData.exists()){
-//                deleteDirectory(orekitData);
-//            }
-//            orekitData.mkdirs();
-//            
-//            Files.copy(orekitResourcesFileInitLocation.toPath(), orekitResourcesFileFinalLocation.toPath(), StandardCopyOption.REPLACE_EXISTING);
-//            extractFile(orekitResourcesFileFinalLocation.toPath(), "orekit-data.zip",orekitDataCompressedFile.toPath());
-//            extractFile(orekitDataCompressedFile.toPath(), "orekit-data/DE-440-ephemerides/lnxp2021.440",
-//                    new File(orekitData,"lnxp2021.440").toPath());
-//            extractFile(orekitDataCompressedFile.toPath(), "orekit-data/UTC-TAI.history",
-//                    new File(orekitData,"UTC-TAI.history").toPath());
-//
-//            Files.delete(new File(System.getProperty("user.dir")+"/orekit-data.zip").toPath());
-//            Files.delete(new File(System.getProperty("user.dir")+"/orekit-resources-2.1.0-SNAPSHOT.jar").toPath());
+            
+            
+            if (orekitData.exists()){
+                deleteDirectory(orekitData);
+            }
+            orekitData.mkdirs();
+            
+            Files.copy(orekitResourcesFileInitLocation.toPath(), orekitResourcesFileFinalLocation.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            extractFile(orekitResourcesFileFinalLocation.toPath(), "orekit-data.zip",orekitDataCompressedFile.toPath());
+            extractFile(orekitDataCompressedFile.toPath(), "orekit-data/DE-440-ephemerides/lnxp2021.440",
+                    new File(orekitData,"lnxp2021.440").toPath());
+            extractFile(orekitDataCompressedFile.toPath(), "orekit-data/UTC-TAI.history",
+                    new File(orekitData,"UTC-TAI.history").toPath());
+
+            Files.delete(new File(System.getProperty("user.dir")+"/orekit-data.zip").toPath());
+            Files.delete(new File(System.getProperty("user.dir")+"/orekit-resources-2.1.0-SNAPSHOT.jar").toPath());
             
             calculate_md5("orekit-data/lnxp2021.440");
             calculate_md5("orekit-data/UTC-TAI.history");
@@ -134,7 +135,8 @@ public class Util {
           PrintWriter telemetryWriter = null;
         try {
             telemetryWriter = new PrintWriter(new FileWriter(FuzzyControl.TELEMETRY_FILE, true));
-            telemetryWriter.print(System.currentTimeMillis());
+//            telemetryWriter.print(System.currentTimeMillis());
+            Comms.simDateTime.durationFrom(AbsoluteDate.JAVA_EPOCH);
             telemetryWriter.format("%13.8f", FuzzyControlAdapter.getInertialAttitude().getA());
             telemetryWriter.format("%13.8f", FuzzyControlAdapter.getInertialAttitude().getB());
             telemetryWriter.format("%13.8f", FuzzyControlAdapter.getInertialAttitude().getC());

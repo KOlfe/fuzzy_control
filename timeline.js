@@ -22,17 +22,19 @@ Controller.desaturateWheels();
 while (Controller.desaturating){
     Sleep.sleep(1000);
 };
-Controller.setControllerType("Fuzzy");
-Controller.setTargetAttitude(0.99905, 0.00000, 0.04362, 0.00000); 
-Sleep.sleep(300000);
-Controller.setTargetAttitude(1.0, 0.0, 0.0, 0.0);
-Sleep.sleep(300000);
+//Sleep.sleep(300000);
+//Controller.setControllerType("Fuzzy");
+//Controller.setTargetAttitude(0.99905, 0.00000, 0.04362, 0.00000); 
+//Sleep.sleep(300000);
+//Controller.setTargetAttitude(1.0, 0.0, 0.0, 0.0);
+//Sleep.sleep(300000);
 
 Controller.setControllerType("PID");
+Sleep.sleep(300000);
 Controller.setTargetAttitude(0.99905, 0.00000, 0.04362, 0.00000); 
-Sleep.sleep(300000);
+Sleep.sleep(500000);
 Controller.setTargetAttitude(1.0, 0.0, 0.0, 0.0);
-Sleep.sleep(300000);
+Sleep.sleep(500000);
 
 Controller.setControllerType("Fuzzy");
 Controller.setTargetAttitude(0.99905, 0.00000, -0.04362, 0.00000);  
