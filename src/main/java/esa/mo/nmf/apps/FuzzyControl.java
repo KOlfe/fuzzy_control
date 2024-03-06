@@ -161,11 +161,12 @@ public class FuzzyControl {
 //        Comms.write42(torque);
 //    }
 //    }, 0, 200, TimeUnit.MILLISECONDS, true); 
+    System.exit(0);
     }
     
     static void executeMain(int refreshRate, int initialDelay){
         int i=0;
-        while (i < 1000) {
+        while (i < 1000000/REFRESH_RATE) {
             i=i+1;
         // TIMER.scheduleTask(new Thread() {
         //     @Override 
