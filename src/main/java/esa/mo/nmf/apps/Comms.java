@@ -101,6 +101,7 @@ public static void read42(){
 static void write42(VectorF3D torque){
     try {
         //out.format("SC[0].AC.IdealTrq = %18.12e %18.12e %18.12e %n", torque.getX(), torque.getY(), torque.getZ());
+        out.println();
         out.println("SC[0].AC.Whl[0].Tcmd = "+ torque.getX().toString());
         out.println("SC[0].AC.Whl[1].Tcmd = "+ torque.getY().toString());
         out.println("SC[0].AC.Whl[2].Tcmd = "+ torque.getZ().toString());

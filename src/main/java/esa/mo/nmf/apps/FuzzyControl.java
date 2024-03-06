@@ -164,9 +164,12 @@ public class FuzzyControl {
     }
     
     static void executeMain(int refreshRate, int initialDelay){
-        TIMER.scheduleTask(new Thread() {
-            @Override 
-            public void run() {
+        int i=0;
+        while (i < 1000) {
+            i=i+1;
+        // TIMER.scheduleTask(new Thread() {
+        //     @Override 
+        //     public void run() {
 //                try {
 //                    if (reconnectionTry > 10) {
 //                        Thread.sleep(300000);
@@ -199,7 +202,7 @@ public class FuzzyControl {
 //                    Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
 //                }
             }
-        }, initialDelay, refreshRate, TimeUnit.MILLISECONDS, true);        
+        // }, initialDelay, refreshRate, TimeUnit.MILLISECONDS, true);        
     }
 
     
