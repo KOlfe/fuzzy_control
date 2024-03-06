@@ -129,19 +129,19 @@ public class FuzzyControl {
         
         initiateFIS("Fuzzy_CP.fcl");
         
-        while (iADCSinitialConectionError){
-            iADCSinitialConectionError = setIADCSIdleMode();
-            try {
-                Thread.sleep(5000);
-                reconnectionTry++;
-                if (reconnectionTry > 10) {
-                        Thread.sleep(300000);
-                        reconnectionTry = 0;
-                    }
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-        }
+        // while (iADCSinitialConectionError){
+        //     iADCSinitialConectionError = setIADCSIdleMode();
+        //     try {
+        //         Thread.sleep(5000);
+        //         reconnectionTry++;
+        //         if (reconnectionTry > 10) {
+        //                 Thread.sleep(300000);
+        //                 reconnectionTry = 0;
+        //             }
+        //     } catch (InterruptedException ex1) {
+        //         Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex1);
+        //     }
+        // }
         
         for (int i=0;i<3;i++){
             wheelTargetVelocities.add(i,(float)0.0);
@@ -292,7 +292,7 @@ public class FuzzyControl {
     
     static void applyActuation(){
 //        System.out.println("actuation ="+ actuation);
-        try {
+        // try {
             if (abs(actuation.getX())<0.5){
                 actuation.setX(2*actuation.getX());
             } else {
@@ -377,13 +377,13 @@ public class FuzzyControl {
 //                    ReactionWheelIdentifier.WHEEL_Z,wheelTargetVelocities.get(2));
             
 // Set the six wheel velocities
-            connector.getPlatformServices().getAutonomousADCSService().setAllReactionWheelSpeeds(
-            wheelTargetVelocities.get(0), wheelTargetVelocities.get(1), wheelTargetVelocities.get(2),(float)0.0,(float)0.0,(float)0.0); 
+            // connector.getPlatformServices().getAutonomousADCSService().setAllReactionWheelSpeeds(
+            // wheelTargetVelocities.get(0), wheelTargetVelocities.get(1), wheelTargetVelocities.get(2),(float)0.0,(float)0.0,(float)0.0); 
             //wheelTargetVelocities.get(3), wheelTargetVelocities.get(4), wheelTargetVelocities.get(5));
 
-        } catch (NMFException | IOException | MALInteractionException | MALException ex) {
-            Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        // } catch (NMFException | IOException | MALInteractionException | MALException ex) {
+        //     Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
+        // }
     }
     
   public static  Quaternion getTargetAttitude(){

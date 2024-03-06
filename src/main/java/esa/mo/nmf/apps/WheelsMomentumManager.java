@@ -81,11 +81,11 @@ public class WheelsMomentumManager extends Thread{
 //            System.out.println("w = "+w);
 //            System.out.println("m = "+m);
 
-            try {
-                FuzzyControl.connector.getPlatformServices().getAutonomousADCSService().setAllMagnetorquersDipoleMoments(m.getX(), m.getY(), m.getZ());
-            } catch (NMFException | IOException | MALInteractionException | MALException ex) {
-                Logger.getLogger(WheelsMomentumManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            // try {
+            //     FuzzyControl.connector.getPlatformServices().getAutonomousADCSService().setAllMagnetorquersDipoleMoments(m.getX(), m.getY(), m.getZ());
+            // } catch (NMFException | IOException | MALInteractionException | MALException ex) {
+            //     Logger.getLogger(WheelsMomentumManager.class.getName()).log(Level.SEVERE, null, ex);
+            // }
         } else{
             stopMagnetorquers();
         }
@@ -171,12 +171,12 @@ public class WheelsMomentumManager extends Thread{
     }
     
     void stopMagnetorquers(){
-        try {
-                FuzzyControl.connector.getPlatformServices().getAutonomousADCSService().setAllMagnetorquersDipoleMoments(
-                        0.0f, 0.0f, 0.0f);
-            } catch (NMFException | IOException | MALInteractionException | MALException ex) {
-                Logger.getLogger(WheelsMomentumManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        // try {
+        //         FuzzyControl.connector.getPlatformServices().getAutonomousADCSService().setAllMagnetorquersDipoleMoments(
+        //                 0.0f, 0.0f, 0.0f);
+        //     } catch (NMFException | IOException | MALInteractionException | MALException ex) {
+        //         Logger.getLogger(WheelsMomentumManager.class.getName()).log(Level.SEVERE, null, ex);
+        //     }
             Comms.m.setX(0.0f);
             Comms.m.setY(0.0f);
             Comms.m.setZ(0.0f);
