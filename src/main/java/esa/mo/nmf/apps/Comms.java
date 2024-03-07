@@ -36,7 +36,7 @@ public static Quaternion inertialAttitude = new Quaternion();
 public static FloatList wheelsSpeed = new FloatList(3);
 public static VectorF3D m = new VectorF3D(0.0f, 0.0f, 0.0f);
 public static VectorF3D B = new VectorF3D();
-public static AbsoluteDate simDateTime;
+public static AbsoluteDate simDateTime = AbsoluteDate.JAVA_EPOCH;
 
 public static void initComms(){
     wheelsSpeed.add(0.0f);
@@ -127,7 +127,15 @@ private static void parseDateandTime(String line){
     TimeComponents simTime = new TimeComponents(Integer.parseInt(yearDoyHour[2]),Integer.parseInt(dateMinSecond[1]), Double.parseDouble(dateMinSecond[2]));
 //    System.out.println("time : "+simTime.toString());
     simDateTime = new AbsoluteDate(simDate, simTime, TimeScalesFactory.getUTC()); 
-    System.out.println("output : "+simDateTime.toString());
+    // System.out.println("output : "+simDateTime.toString());
 } 
+
+public static double computeDelayedTime(int milliseconds){
+    return simDateTime.durationFrom(AbsoluteDate.JAVA_EPOCH)+milliseconds/1000.;
+}
+
+public static double getCurrentTime(){
+    return simDateTime.durationFrom(AbsoluteDate.JAVA_EPOCH);
+}
     
 }

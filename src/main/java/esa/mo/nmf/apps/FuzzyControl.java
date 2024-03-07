@@ -152,7 +152,7 @@ public class FuzzyControl {
         TIMELINE_EXECUTOR.start();
         
 //        executeMain(REFRESH_RATE, 5000);                                                                         
-        executeMain(200, 5000); 
+        executeMain(200, 0); 
     
 //        TIMER.scheduleTask(new Thread() {
 //            @Override
@@ -545,7 +545,7 @@ public class FuzzyControl {
                 log("TLE line 1 = "+line1);
                 log("TLE line 2 = "+line2);
                 OrbitalFrame.opsSatTLE = new TLE(line1, line2); 
-                System.out.println(OrbitalFrame.opsSatTLE.getDate().toString());
+                System.out.println("TLE date = "+OrbitalFrame.opsSatTLE.getDate().toString());
             }
             
       } catch (IOException ex) {
