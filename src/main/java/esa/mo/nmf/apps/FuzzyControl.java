@@ -123,8 +123,8 @@ public class FuzzyControl {
         checkFilesUpdates();
         Util.initOrekitFiles();
         
-        adapter = new FuzzyControlAdapter(connector);
-        connector.init(adapter);
+        // adapter = new FuzzyControlAdapter(connector);
+        // connector.init(adapter);
 //        adapter.startAdcsAttitudeMonitoring();
         
         initiateFIS("Fuzzy_CP.fcl");
@@ -399,22 +399,22 @@ public class FuzzyControl {
       targetAttitude.setB(qb);
       targetAttitude.setC(qc);
       targetAttitude.setD(qd);  
-      try {
-          connector.pushParameterValue(FuzzyControlAdapter.PARAMETER_ATTITUDE_TARGET_Q_A, targetAttitude.getA());
-          connector.pushParameterValue(FuzzyControlAdapter.PARAMETER_ATTITUDE_TARGET_Q_B, targetAttitude.getB());
-          connector.pushParameterValue(FuzzyControlAdapter.PARAMETER_ATTITUDE_TARGET_Q_C, targetAttitude.getC());
-          connector.pushParameterValue(FuzzyControlAdapter.PARAMETER_ATTITUDE_TARGET_Q_D, targetAttitude.getD());
-      } catch (NMFException ex) {
-          Logger.getLogger(FuzzyControlAdapter.class.getName()).log(Level.SEVERE, null, ex);
-      }
+    //   try {
+    //       connector.pushParameterValue(FuzzyControlAdapter.PARAMETER_ATTITUDE_TARGET_Q_A, targetAttitude.getA());
+    //       connector.pushParameterValue(FuzzyControlAdapter.PARAMETER_ATTITUDE_TARGET_Q_B, targetAttitude.getB());
+    //       connector.pushParameterValue(FuzzyControlAdapter.PARAMETER_ATTITUDE_TARGET_Q_C, targetAttitude.getC());
+    //       connector.pushParameterValue(FuzzyControlAdapter.PARAMETER_ATTITUDE_TARGET_Q_D, targetAttitude.getD());
+    //   } catch (NMFException ex) {
+    //       Logger.getLogger(FuzzyControlAdapter.class.getName()).log(Level.SEVERE, null, ex);
+    //   }
       
   }
   
   public static void setControllerType(String controller){
       PIDComparator.resetErrorIntegral();
       controllerType = controller;
-      try {
-          connector.pushParameterValue(FuzzyControlAdapter.PARAMETER_CONTROLLER_TYPE, controllerType);
+    //   try {
+        //   connector.pushParameterValue(FuzzyControlAdapter.PARAMETER_CONTROLLER_TYPE, controllerType);
           if (controllerType.equals("PID")) {                      
               log("Kpx : " + PIDComparator.Kpx.toString());
               log("Kix : " + PIDComparator.Kix.toString());
@@ -426,9 +426,9 @@ public class FuzzyControl {
               log("Kiz : " + PIDComparator.Kiz.toString());
               log("Kdz : " + PIDComparator.Kdz.toString());
           }
-      } catch (NMFException ex) {
-          Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
-      }
+    //   } catch (NMFException ex) {
+    //       Logger.getLogger(FuzzyControl.class.getName()).log(Level.SEVERE, null, ex);
+    //   }
   }
   
   public static String getControllerType(){
@@ -439,7 +439,8 @@ public class FuzzyControl {
       desaturating = true;
 //      System.out.println("Desaturating wheels");
       WheelsMomentumManager.counter=0;
-      WheelsMomentumManager.t = TIMER.scheduleTask(new WheelsMomentumManager(), 0, 200, TimeUnit.MILLISECONDS, true);
+    //   WheelsMomentumManager.t = TIMER.scheduleTask(new WheelsMomentumManager(), 0, 200, TimeUnit.MILLISECONDS, true);
+    new WheelsMomentumManager().start();
   }
   
   static boolean desaturationNeeded(){

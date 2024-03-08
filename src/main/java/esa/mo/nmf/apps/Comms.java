@@ -35,7 +35,7 @@ static BufferedReader in;
 public static Quaternion inertialAttitude = new Quaternion();
 public static FloatList wheelsSpeed = new FloatList(3);
 public static VectorF3D m = new VectorF3D(0.0f, 0.0f, 0.0f);
-public static VectorF3D B = new VectorF3D();
+public static VectorF3D B = new VectorF3D(0.0f, 0.0f, 0.0f);
 public static AbsoluteDate simDateTime = AbsoluteDate.JAVA_EPOCH;
 
 public static void initComms(){

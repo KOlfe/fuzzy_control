@@ -15,7 +15,7 @@ function sleep(t) {
 Controller.log('Init experiment script');
 
 Controller.log('Checking files integrity');
-Sleep.sleep(2000)
+Sleep.sleep(3000)
 
 Verifier.calculate_md5("Fuzzy_CP.fcl");
 Verifier.calculate_md5("Fuzzy_LC.fcl");
@@ -28,23 +28,24 @@ PID.setPIDGains(5.98e+0, 5.21e-2, 3.43e+2, 1.19e+1, 1.84e-1, 5.87e+2, 3.49e+0, 1
 
 Controller.updateTLE();
 Controller.log('Executing Exp 10');
-// Controller.desaturateWheels();
-// while (Controller.desaturating){
-//     Sleep.sleep(10);
-// };
-sleep(300000);
+Controller.desaturateWheels();
+while (Controller.desaturating){
+    Sleep.sleep(10);
+};
+
 Controller.setControllerType("Fuzzy");
+sleep(300000);
+print('hola')
 Controller.setTargetAttitude(0.99905, 0.00000, 0.04362, 0.00000); 
 sleep(300000);
 Controller.setTargetAttitude(1.0, 0.0, 0.0, 0.0);
 sleep(300000);
 
 Controller.setControllerType("PID");
-sleep(300000);
 Controller.setTargetAttitude(0.99905, 0.00000, 0.04362, 0.00000); 
-sleep(500000);
+sleep(300000);
 Controller.setTargetAttitude(1.0, 0.0, 0.0, 0.0);
-sleep(500000);
+sleep(300000);
 
 Controller.setControllerType("Fuzzy");
 Controller.setTargetAttitude(0.99905, 0.00000, -0.04362, 0.00000);  

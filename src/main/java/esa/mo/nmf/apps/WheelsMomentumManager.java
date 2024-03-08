@@ -37,6 +37,17 @@ public class WheelsMomentumManager extends Thread{
     
     @Override    
     public void run() {
+        double maxDesaturationTime = Comms.computeDelayedTime(20*60*1000); 
+        
+        while (true) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            double currentTime = Comms.getCurrentTime();
+        
 //        encender al 80% y apagar al 40% 
 //        y la maniobra 0 en principio al 10%
         
@@ -91,12 +102,14 @@ public class WheelsMomentumManager extends Thread{
         }
         counter++;
 //        System.out.println("count = "+counter);
-        if ( (counter>6000) || desaturationComplete()){
+        if ( (currentTime>maxDesaturationTime) || desaturationComplete()){
             FuzzyControl.desaturating = false;
             stopMagnetorquers();
-            FuzzyControl.TIMER.stopTask(t);
+            // FuzzyControl.TIMER.stopTask(t);
+            return;
         }
     }
+}
     
     void updateWheelPerpendicular(){
 //        double lenght = sqrt(FuzzyControl.magneticField.getX()*FuzzyControl.magneticField.getX()+
