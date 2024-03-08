@@ -314,13 +314,13 @@ public class FuzzyControl {
             }
              
             //actuation in torque with 10% of whell comand error
-            torque.setX(actuation.getX()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
-            torque.setY(actuation.getY()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
-            torque.setZ(actuation.getZ()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
+            // torque.setX(actuation.getX()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
+            // torque.setY(actuation.getY()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
+            // torque.setZ(actuation.getZ()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
             //Nominal actuation in torque
-//            torque.setX(actuation.getX()*WHEEL_MAX_TORQUE);
-//            torque.setY(actuation.getY()*WHEEL_MAX_TORQUE);
-//            torque.setZ(actuation.getZ()*WHEEL_MAX_TORQUE);
+           torque.setX(actuation.getX()*WHEEL_MAX_TORQUE);
+           torque.setY(actuation.getY()*WHEEL_MAX_TORQUE);
+           torque.setZ(actuation.getZ()*WHEEL_MAX_TORQUE);
 //            System.out.println("torque commanded ="+torque);
             
             

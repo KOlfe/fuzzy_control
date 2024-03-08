@@ -62,6 +62,10 @@ public class OrbitalFrame {
   );
             
     static void getOrbitalFrame(){
+
+//  NMF GPS geodetic coordinates
+//  ****************************
+
 //        try {
 //            if (FuzzyControl.connector== null) {  // The framework is still not available
 //                    return;
@@ -74,31 +78,45 @@ public class OrbitalFrame {
 //        } catch (NMFException | IOException | MALInteractionException | MALException ex) {
 //            Logger.getLogger(OrbitalFrame.class.getName()).log(Level.SEVERE, null, ex);
 //        }
-//
+
+
+// DATE
+// ****
+
+// Simulation date:
+                AbsoluteDate OS_date = Comms.simDateTime;
+
+// NMF GPS Data date (firs is the time the GPS acquire the data, if elapsed time is big, a propagation to current time will be needed);
         //AbsoluteDate OS_date = new AbsoluteDate(AbsoluteDate.JAVA_EPOCH, ((double)System.currentTimeMillis())/1000.0 - elapsed_time, TimeScalesFactory.getUTC());
 //        AbsoluteDate OS_date = new AbsoluteDate(AbsoluteDate.JAVA_EPOCH, ((double)System.currentTimeMillis())/1000.0, TimeScalesFactory.getUTC());
-        AbsoluteDate OS_date = Comms.simDateTime;
 //System.out.println("Date = "+OS_date);
 ////    
 ////        Calendar cal = Calendar.getInstance();
 ////        SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH:mm:ss.SSS");
 ////        System.out.println("Java dice:   " + sdf.format(cal.getTime()) );
 ////        System.out.println("Orekit dice: " + OS_date);
-//
+
+
+//  NADIR
+//  *****
+
+//  Nadir from NMF GPS (without propagation)
 //        GeodeticPoint opssatOnEarth = new GeodeticPoint(FastMath.toRadians(latitude), FastMath.toRadians(longitude), altitude);
 ////        System.out.println(opssatOnEarth.getNadir());
-//
-
 //        Frame earthFrame = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
-//        
 //        Transform earthToInertial = earthFrame.getTransformTo(inertialFrame, OS_date);
 //        nadir = earthToInertial.transformVector(opssatOnEarth.getNadir());
 //            System.out.println("orekit TLE line 1= "+opsSatTLE.getLine1());
 //            System.out.println("orekit TLE line 2= "+opsSatTLE.getLine2());
-        SGP4 propagator = new SGP4(opsSatTLE, new NadirPointing(inertialFrame, earthShape), 5.777673);
-        nadir = propagator.propagate(OS_date).getOrbit().getPVCoordinates().getPosition().negate().normalize();
-        nadir = TEMEFrame.getTransformTo(inertialFrame, OS_date).transformPosition(nadir);
+
+//  Nadir from TLE propagation
+        // SGP4 propagator = new SGP4(opsSatTLE, new NadirPointing(inertialFrame, earthShape), 5.777673);
+        // nadir = propagator.propagate(OS_date).getOrbit().getPVCoordinates().getPosition().negate().normalize();
+        // nadir = TEMEFrame.getTransformTo(inertialFrame, OS_date).transformPosition(nadir);
 //            System.out.println("nadir: "+nadir);
+
+// Nadir from simulation
+        nadir = Comms.nadir;
         
 
         
