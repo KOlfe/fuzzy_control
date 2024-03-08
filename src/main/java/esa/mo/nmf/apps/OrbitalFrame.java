@@ -148,14 +148,22 @@ public class OrbitalFrame {
        
         sun = orekitSunVector;
 //        System.out.println("orekit sun = "+sun.toString());
-        Rotation inertialToExperimentRotation = new Rotation(nadir, sun , 
-                new org.hipparchus.geometry.euclidean.threed.Vector3D(0.0,0.0, -1.0),
-                new org.hipparchus.geometry.euclidean.threed.Vector3D(-1.0,0.0,0.0));
+
+
+// Nadir-Sun Orbital Frame
+// ***********************
+        // Rotation inertialToExperimentRotation = new Rotation(nadir, sun , 
+        //         new org.hipparchus.geometry.euclidean.threed.Vector3D(0.0,0.0, -1.0),
+        //         new org.hipparchus.geometry.euclidean.threed.Vector3D(-1.0,0.0,0.0));
         
-//        System.out.println("Inertial to Experiment: " + inertialToExperimentRotation.getQ0()+
-//                                                        inertialToExperimentRotation.getQ1()+
-//                                                        inertialToExperimentRotation.getQ2()+
-//                                                        inertialToExperimentRotation.getQ3());
+
+// Nadir- velocity Orbital Frame
+// *****************************
+        Rotation inertialToExperimentRotation = new Rotation(nadir, Comms.velocityVersor , 
+                new org.hipparchus.geometry.euclidean.threed.Vector3D(0.0,0.0, -1.0),
+                new org.hipparchus.geometry.euclidean.threed.Vector3D(0.0,-1.0,0.0));
+
+
 //        System.out.println("sun:   " + inertialToExperimentRotation.applyTo(sun));
 //        System.out.println("nadir: " + inertialToExperimentRotation.applyTo(nadir));
         Rotation bodyToExperiment = inertialToExperimentRotation.applyTo(bodyToInertialRotation);

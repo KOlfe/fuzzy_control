@@ -37,6 +37,7 @@ public static FloatList wheelsSpeed = new FloatList(3);
 public static VectorF3D m = new VectorF3D(0.0f, 0.0f, 0.0f);
 public static VectorF3D B = new VectorF3D(0.0f, 0.0f, 0.0f);
 public static Vector3D nadir;
+public static Vector3D velocityVersor;
 public static AbsoluteDate simDateTime = AbsoluteDate.JAVA_EPOCH;
 
 public static void initComms(){
@@ -63,11 +64,13 @@ public static void read42(){
        Vector3D PosN = new Vector3D(Double.parseDouble(pos[2]), Double.parseDouble(pos[3]), Double.parseDouble(pos[4]));
        nadir = PosN.negate().normalize();
 //        System.out.println("nadir 42: "+PosN.negate().normalize().toString());
-        in.readLine();
         line = in.readLine();
-//        System.out.println(line);
-        in.readLine();
-        in.readLine();
+        String vel[] = line.split(" ");
+        Vector3D VelN = new Vector3D(Double.parseDouble(vel[2]), Double.parseDouble(vel[3]), Double.parseDouble(vel[4]));
+        velocityVersor = VelN.normalize();
+        in.readLine(); //svn
+        in.readLine(); //svb
+        in.readLine(); //bvb
         line = in.readLine();
         String[] magneticField = line.split(" ");
         B.setX(Float.parseFloat(magneticField[2]));

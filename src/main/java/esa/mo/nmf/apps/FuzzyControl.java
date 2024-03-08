@@ -149,7 +149,7 @@ public class FuzzyControl {
             
         updateTLE();
         
-        TIMELINE_EXECUTOR.start();
+        // TIMELINE_EXECUTOR.start();
         
 //        executeMain(REFRESH_RATE, 5000);                                                                         
         executeMain(200, 0); 
@@ -166,7 +166,7 @@ public class FuzzyControl {
     
     static void executeMain(int refreshRate, int initialDelay){
         int i=0;
-        while (i < 1000000/REFRESH_RATE) {
+        while (i < 1000*1000/REFRESH_RATE) {
             i=i+1;
         // TIMER.scheduleTask(new Thread() {
         //     @Override 
