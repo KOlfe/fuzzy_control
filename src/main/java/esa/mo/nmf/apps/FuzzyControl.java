@@ -112,7 +112,12 @@ public class FuzzyControl {
      * @throws java.lang.Exception If there is an error
      */
     public static void main(final String args[]) {
+        if(args.length!=0){
+            Comms.setPortNumber(Integer.parseInt(args[0]));
+        }
         Comms.initComms();
+        
+        
 
         try {
             Files.deleteIfExists(new File("comArchive.db").toPath());
@@ -128,6 +133,8 @@ public class FuzzyControl {
 //        adapter.startAdcsAttitudeMonitoring();
         
         initiateFIS("Fuzzy_CP.fcl");
+        PIDComparator.setPIDGains(5.98e+0f, 5.21e-2f, 3.43e+2f, 1.19e+1f, 1.84e-1f, 5.87e+2f, 3.49e+0f, 1.82e-1f, 9.45e+1f);
+
         
         // while (iADCSinitialConectionError){
         //     iADCSinitialConectionError = setIADCSIdleMode();

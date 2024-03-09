@@ -29,7 +29,7 @@ import org.orekit.time.TimeScalesFactory;
 public class Comms {
     
 final static String HOST_NAME = "localhost";
-final static int PORT_NUMBER = 10001;
+static int PORT_NUMBER = 1;
 static PrintWriter out;
 static BufferedReader in;
 public static Quaternion inertialAttitude = new Quaternion();
@@ -40,12 +40,16 @@ public static Vector3D nadir;
 public static Vector3D velocityVersor;
 public static AbsoluteDate simDateTime = AbsoluteDate.JAVA_EPOCH;
 
+public static void setPortNumber(int port_number){
+    PORT_NUMBER = port_number;
+}
+
 public static void initComms(){
     wheelsSpeed.add(0.0f);
     wheelsSpeed.add(0.0f);
     wheelsSpeed.add(0.0f);
     try {
-    Socket echoSocket = new Socket(HOST_NAME, PORT_NUMBER);
+    Socket echoSocket = new Socket(HOST_NAME, 10000 + PORT_NUMBER);
     out = new PrintWriter(echoSocket.getOutputStream(), true);
     in = new BufferedReader(
             new InputStreamReader(echoSocket.getInputStream()));
@@ -105,14 +109,15 @@ public static void read42(){
 
 static void write42(VectorF3D torque){
     try {
+        int SC =PORT_NUMBER-1;
         //out.format("SC[0].AC.IdealTrq = %18.12e %18.12e %18.12e %n", torque.getX(), torque.getY(), torque.getZ());
         out.println();
-        out.println("SC[0].AC.Whl[0].Tcmd = "+ torque.getX().toString());
-        out.println("SC[0].AC.Whl[1].Tcmd = "+ torque.getY().toString());
-        out.println("SC[0].AC.Whl[2].Tcmd = "+ torque.getZ().toString());
-        out.println("SC[0].AC.MTB[0].Mcmd = "+ Comms.m.getX().toString());
-        out.println("SC[0].AC.MTB[1].Mcmd = "+ Comms.m.getY().toString());
-        out.println("SC[0].AC.MTB[2].Mcmd = "+ Comms.m.getZ().toString());
+        out.println("SC["+SC+"].AC.Whl[0].Tcmd = "+ torque.getX().toString());
+        out.println("SC["+SC+"].AC.Whl[1].Tcmd = "+ torque.getY().toString());
+        out.println("SC["+SC+"].AC.Whl[2].Tcmd = "+ torque.getZ().toString());
+        out.println("SC["+SC+"].AC.MTB[0].Mcmd = "+ Comms.m.getX().toString());
+        out.println("SC["+SC+"].AC.MTB[1].Mcmd = "+ Comms.m.getY().toString());
+        out.println("SC["+SC+"].AC.MTB[2].Mcmd = "+ Comms.m.getZ().toString());
         out.println("[EOF]");
         String line = in.readLine();
 //        System.out.println(line);
