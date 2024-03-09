@@ -104,9 +104,10 @@ public class Util {
             File orekitData = new File(System.getProperty("user.dir")+"/orekit-data");
             
             
-            if (orekitData.exists()){
-                deleteDirectory(orekitData);
-            }
+            // if (orekitData.exists()){
+            //     deleteDirectory(orekitData);
+            // }
+            if (!orekitData.exists()){
             orekitData.mkdirs();
             
             Files.copy(orekitResourcesFileInitLocation.toPath(), orekitResourcesFileFinalLocation.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -118,13 +119,13 @@ public class Util {
 
             Files.delete(new File(System.getProperty("user.dir")+"/orekit-data.zip").toPath());
             Files.delete(new File(System.getProperty("user.dir")+"/orekit-resources-2.1.0-SNAPSHOT.jar").toPath());
-            
+            }
             calculate_md5("orekit-data/lnxp2021.440");
             calculate_md5("orekit-data/UTC-TAI.history");
             
             DataProvidersManager manager = DataProvidersManager.getInstance();
             manager.addProvider(new DirectoryCrawler(orekitData));
-            
+
         } catch (IOException ex) {
             Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
