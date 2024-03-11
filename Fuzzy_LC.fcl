@@ -1,4 +1,4 @@
-FUNCTION_BLOCK Y_axis
+FUNCTION_BLOCK X_axis
 
 // Define input variables
 VAR_INPUT
@@ -104,7 +104,7 @@ END_RULEBLOCK
 END_FUNCTION_BLOCK
 
 
-FUNCTION_BLOCK X_axis
+FUNCTION_BLOCK Y_axis
 
 // Define input variables
 VAR_INPUT
