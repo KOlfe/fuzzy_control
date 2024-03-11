@@ -114,6 +114,19 @@ public class FuzzyControl {
     public static void main(final String args[]) {
         if(args.length!=0){
             Comms.setPortNumber(Integer.parseInt(args[0]));
+            PrintWriter headerWriter = null;
+            try {
+                headerWriter = new PrintWriter(new FileWriter(FuzzyControl.TELEMETRY_FILE, true));
+                for(String s:args){
+                    headerWriter.print(s+" ");
+                }
+                headerWriter.println();
+            } catch (IOException ex) {
+                Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                headerWriter.close();
+            }
+
         }
         Comms.initComms();
         
@@ -154,7 +167,7 @@ public class FuzzyControl {
             wheelTargetVelocities.add(i,(float)0.0);
         }
             
-        updateTLE();
+        // updateTLE();
         
         // TIMELINE_EXECUTOR.start();
         
@@ -173,7 +186,7 @@ public class FuzzyControl {
     
     static void executeMain(int refreshRate, int initialDelay){
         int i=0;
-        while (i < 1000*1000/REFRESH_RATE) {
+        while (i < 600*1000/REFRESH_RATE) {
             i=i+1;
         // TIMER.scheduleTask(new Thread() {
         //     @Override 
