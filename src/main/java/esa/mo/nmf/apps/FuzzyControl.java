@@ -146,7 +146,17 @@ public class FuzzyControl {
 //        adapter.startAdcsAttitudeMonitoring();
         
         initiateFIS("Fuzzy_CP.fcl");
-        PIDComparator.setPIDGains(5.98e+0f, 5.21e-2f, 3.43e+2f, 1.19e+1f, 1.84e-1f, 5.87e+2f, 3.49e+0f, 1.82e-1f, 9.45e+1f);
+        
+        // CP PID gains:
+        PIDComparator.setPIDGains(2.15e+1f, 7.07e-1f, 5.15e+2f, 2.05e+1f, 8.57e-1f, 5.22e+2f, 1.46e+1f, 9.95e-1f, 1.74e+2f);
+        
+        //LC PID gains:
+        // PIDComparator.setPIDGains(5.98e+0f, 5.21e-2f, 3.43e+2f, 1.19e+1f, 1.84e-1f, 5.87e+2f, 3.49e+0f, 1.82e-1f, 9.45e+1f);
+       
+        //LE PID gains:
+        // PIDComparator.setPIDGains(4.54e+1f, 9.43e-1f, 3.55e+2f, 1.34e+2f, 7.77e-2f, 5.94e+2f, 9.55e+1f, 2.61e-1f, 2.47e+2f);
+
+        
 
         
         // while (iADCSinitialConectionError){
