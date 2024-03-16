@@ -113,7 +113,7 @@ public class FuzzyControl {
      */
     public static void main(final String args[]) {
         if(args.length!=0){
-            Comms.setPortNumber(Integer.parseInt(args[0]));
+            Comms.setPortNumber(Integer.parseInt(args[0]),Integer.parseInt(args[1]));
             PrintWriter headerWriter = null;
             try {
                 headerWriter = new PrintWriter(new FileWriter(FuzzyControl.TELEMETRY_FILE, true));

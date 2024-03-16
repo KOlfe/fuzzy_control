@@ -106,11 +106,6 @@ public class HinftyController {
                 double[][] matrixDataDz = {{0.0}};
                 this.D = new Array2DRowRealMatrix(matrixDataDz);
                 break;
-
-
-                
-                
-        
             default:
                 break;
         }
@@ -124,7 +119,7 @@ public class HinftyController {
         RealMatrix xNext = x.add(Ax.add(Bu).scalarMultiply(dt));
 
         // Compute output: y(t) = Cx(t) + Du(t)
-        RealMatrix y = C.multiply(x).add(D.multiply(u));
+        RealMatrix y = C.multiply(xNext).add(D.multiply(u));
 
         // Return the updated state (xNext) and output (y)
         return y;
