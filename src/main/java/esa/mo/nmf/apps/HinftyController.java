@@ -10,6 +10,7 @@ public class HinftyController {
     private RealMatrix B; // Input matrix
     private RealMatrix C; // Output matrix
     private RealMatrix D; // Feedthrough matrix
+    private RealMatrix x; // State Vector
 
     // Constructor to initialize matrices (you can set your own values)
     public HinftyController(RealMatrix A, RealMatrix B, RealMatrix C, RealMatrix D) {
@@ -19,6 +20,7 @@ public class HinftyController {
         this.B = B;
         this.C = C;
         this.D = D;
+        this.x = new Array2DRowRealMatrix(A.getColumnDimension(),1);
     }
 
     public HinftyController(String defaultCOntroller) {
@@ -30,7 +32,7 @@ public class HinftyController {
                     {0, -28.755, -2.2806, -0.035094, 0, 0, 6.9657},
                     {-0.00011621, -2.876, 2.1059e-10, 0.030834, -6.9306e-7, 3.9463e-7, 1.1639e-6},
                     {3.5226e-5, -0.36553, -1.3447e-11, 0.0039531, -0.022805, -4.5899e-8, -1.1113e-7},
-                    {0, -0.16669, 0, 0.0031545, 0. -0.05832, -0.02721},
+                    {0, -0.16669, 0, 0.0031545, 0., -0.05832, -0.02721},
                     {0, 0.041396, 0, -0.00044768, 0, 0.03125, 0}};
                 this.A = new Array2DRowRealMatrix(matrixDataAx);
                 
@@ -49,6 +51,8 @@ public class HinftyController {
         
                 double[][] matrixDataDx = {{0.0}};
                 this.D = new Array2DRowRealMatrix(matrixDataDx);
+
+                this.x = new Array2DRowRealMatrix(A.getColumnDimension(),1);
                 break;
 
             case "defaultY":
@@ -77,9 +81,11 @@ public class HinftyController {
         
                 double[][] matrixDataDy = {{0.0}};
                 this.D = new Array2DRowRealMatrix(matrixDataDy);
+
+                this.x = new Array2DRowRealMatrix(A.getColumnDimension(),1);
                 break;
 
-                case "defaultYZ":
+                case "defaultZ":
                 double[][] matrixDataAz = {
                     {-1.73155, -1.56212, 0.00161, 0.00069, 1.39070e-5, 0.01138, 0.32614},
                     {1, -0.41056, 0, 0.00444, 0, 0, 0},
@@ -105,6 +111,8 @@ public class HinftyController {
         
                 double[][] matrixDataDz = {{0.0}};
                 this.D = new Array2DRowRealMatrix(matrixDataDz);
+
+                this.x = new Array2DRowRealMatrix(A.getColumnDimension(),1);
                 break;
             default:
                 break;
@@ -112,12 +120,12 @@ public class HinftyController {
     }
 
     // Perform one-step integration
-    public RealMatrix integrateOneStep(RealMatrix x, RealMatrix u, double dt) {
+    public RealMatrix integrateOneStep(RealMatrix u, double dt) {
         // Compute state update: x(t + dt) = x(t) + dt * (Ax(t) + Bu(t))
         RealMatrix Ax = A.multiply(x);
         RealMatrix Bu = B.multiply(u);
         RealMatrix xNext = x.add(Ax.add(Bu).scalarMultiply(dt));
-
+        x = xNext;
         // Compute output: y(t) = Cx(t) + Du(t)
         RealMatrix y = C.multiply(xNext).add(D.multiply(u));
 

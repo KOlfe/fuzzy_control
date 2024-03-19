@@ -19,6 +19,8 @@ import org.ccsds.moims.mo.mal.MALInteractionException;
 import org.ccsds.moims.mo.platform.autonomousadcs.structures.Quaternion;
 import org.ccsds.moims.mo.platform.gps.body.GetLastKnownPositionResponse;
 import org.hipparchus.geometry.euclidean.threed.Rotation;
+import org.hipparchus.geometry.euclidean.threed.RotationConvention;
+import org.hipparchus.geometry.euclidean.threed.RotationOrder;
 import org.hipparchus.util.FastMath;
 import org.orekit.attitudes.NadirPointing;
 import org.orekit.bodies.CelestialBodyFactory;
@@ -60,6 +62,7 @@ public class OrbitalFrame {
           Float.parseFloat("0.0"),
           Float.parseFloat("0.0")
   );
+    static private double [] navigationAngles = {0., 0., 0.}; 
             
     static void getOrbitalFrame(){
 
@@ -171,11 +174,13 @@ public class OrbitalFrame {
 //        +bodyToExperiment.getQ1()
 //        +bodyToExperiment.getQ2()
 //        +bodyToExperiment.getQ3());
-        
-        settOrbitalAttitude(new Float(bodyToExperiment.getQ0()),
-                           new Float(-bodyToExperiment.getQ1()),
-                           new Float(-bodyToExperiment.getQ2()),
-                           new Float(-bodyToExperiment.getQ3()));
+
+        setNavigationAngles(bodyToExperiment.getAngles(RotationOrder.ZYX, RotationConvention.FRAME_TRANSFORM));
+
+        settOrbitalAttitude((float)bodyToExperiment.getQ0(),
+                           (float)-bodyToExperiment.getQ1(),
+                           (float)-bodyToExperiment.getQ2(),
+                           (float)-bodyToExperiment.getQ3());
 //        Transform inertialToExperiment = new Transform (OS_date, inertialToExperimentRotation ); 
         
         
@@ -189,7 +194,7 @@ public class OrbitalFrame {
         */
     }
     
-      public static  Quaternion getOrbitalAttitude(){      
+  public static  Quaternion getOrbitalAttitude(){      
           return orbitalAttitude;
   }
   
@@ -199,4 +204,14 @@ public class OrbitalFrame {
       orbitalAttitude.setC(qc);
       orbitalAttitude.setD(qd);      
   }
+
+  public static double[] getNavigationAngles(){
+        return navigationAngles;
+  }
+
+  private static void setNavigationAngles(double[] angles){
+        navigationAngles = angles;
+  }
+
+
 }

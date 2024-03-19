@@ -62,6 +62,7 @@ import org.ccsds.moims.mo.platform.autonomousadcs.structures.AttitudeTelemetry;
 import org.ccsds.moims.mo.platform.autonomousadcs.structures.Quaternion;
 //import org.ccsds.moims.mo.platform.autonomousadcs.structures.ReactionWheelIdentifier;
 import org.ccsds.moims.mo.platform.structures.VectorF3D;
+import org.hipparchus.linear.Array2DRowRealMatrix;
 import org.orekit.propagation.analytical.tle.TLE;
 
 
@@ -86,7 +87,7 @@ public class FuzzyControl {
     static FunctionBlock fb_x;
     static FunctionBlock fb_y;
     static FunctionBlock fb_z;
-    private static String controllerType = "Fuzzy";
+    private static String controllerType = "Hinfty";
     static ScriptExecutor TIMELINE_EXECUTOR = new ScriptExecutor("timeline.js");
     public static boolean desaturating = false;
     static final Float WHEEL_MAX_SPEED = (float)(0.8*10000.0*PI/30.0) ;
@@ -102,6 +103,9 @@ public class FuzzyControl {
     static boolean iADCSinitialConectionError=true;
     static int reconnectionTry = 0;
     static boolean controlFlag = true;
+    static HinftyController Hx = new HinftyController("defaultX");
+    static HinftyController Hy = new HinftyController("defaultY");
+    static HinftyController Hz = new HinftyController("defaultZ");
 
  //   static SEPP_IADCS_API adcsApi= new SEPP_IADCS_API();
 
@@ -243,12 +247,37 @@ public class FuzzyControl {
 //        System.out.println("error = "+error.toString());
         updateErrorDerivative();
 //        System.out.println("error derivative = "+errorDerivative.toString());
-        if (controllerType.equals("PID")) {
-            PIDComparator.updateErrorIntegral();
-            PIDComparator.computeActuation();
-        } else{
-            fisEvaluate();
+        switch (controllerType) {
+            case "Fuzzy":
+                fisEvaluate();
+                break;
+
+            case "PID":
+                PIDComparator.updateErrorIntegral();
+                PIDComparator.computeActuation();
+                break;
+
+            case "Hinfty":
+                double angles[];
+                angles = OrbitalFrame.getNavigationAngles();
+                // System.out.println("angles = "+angles[0]+" "+angles[1]+" "+angles[2]);
+                // actuation.setX(0.0f);
+                // actuation.setY(0.0f);
+                // actuation.setZ(0.0f);
+                double[][] ux = {{angles[2]}};
+                actuation.setX((float)Hx.integrateOneStep(new Array2DRowRealMatrix(ux), REFRESH_RATE/1000.).getEntry(0, 0)*WHEEL_INERTIA/WHEEL_MAX_TORQUE);               
+                double[][] uy = {{angles[1]}};
+                actuation.setY((float)Hy.integrateOneStep(new Array2DRowRealMatrix(uy), REFRESH_RATE/1000.).getEntry(0, 0)*WHEEL_INERTIA/WHEEL_MAX_TORQUE);
+                double[][] uz = {{angles[0]}};
+                actuation.setZ((float)Hz.integrateOneStep(new Array2DRowRealMatrix(uz), REFRESH_RATE/1000.).getEntry(0, 0)*WHEEL_INERTIA/WHEEL_MAX_TORQUE);
+                break; 
+        
+            default:
+                System.out.println("Unrecognize controller type. Using Fuzzy");
+                fisEvaluate();
+                break;
         }
+
 //        System.out.println("init control actuation");
         applyActuation();
 //        System.out.println("check saturation");
