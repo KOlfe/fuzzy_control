@@ -30,7 +30,7 @@ public class Comms {
     
 final static String HOST_NAME = "localhost";
 static int PORT_NUMBER = 1;
-static int SC_NUMBER = 1;
+static int SC_NUMBER = 0;
 static PrintWriter out;
 static BufferedReader in;
 public static Quaternion inertialAttitude = new Quaternion();
@@ -113,12 +113,12 @@ static void write42(VectorF3D torque){
     try {
         //out.format("SC[0].AC.IdealTrq = %18.12e %18.12e %18.12e %n", torque.getX(), torque.getY(), torque.getZ());
         out.println();
-        out.println("SC["+SC_NUMBER+"].AC.Whl[0].Tcmd = "+ torque.getX().toString());
-        out.println("SC["+SC_NUMBER+"].AC.Whl[1].Tcmd = "+ torque.getY().toString());
-        out.println("SC["+SC_NUMBER+"].AC.Whl[2].Tcmd = "+ torque.getZ().toString());
-        out.println("SC["+SC_NUMBER+"].AC.MTB[0].Mcmd = "+ Comms.m.getX().toString());
-        out.println("SC["+SC_NUMBER+"].AC.MTB[1].Mcmd = "+ Comms.m.getY().toString());
-        out.println("SC["+SC_NUMBER+"].AC.MTB[2].Mcmd = "+ Comms.m.getZ().toString());
+        out.println("SC["+SC_NUMBER+"].Whl[0].Tcmd = "+ torque.getX().toString());
+        out.println("SC["+SC_NUMBER+"].Whl[1].Tcmd = "+ torque.getY().toString());
+        out.println("SC["+SC_NUMBER+"].Whl[2].Tcmd = "+ torque.getZ().toString());
+        out.println("SC["+SC_NUMBER+"].MTB[0].Mcmd = "+ Comms.m.getX().toString());
+        out.println("SC["+SC_NUMBER+"].MTB[1].Mcmd = "+ Comms.m.getY().toString());
+        out.println("SC["+SC_NUMBER+"].MTB[2].Mcmd = "+ Comms.m.getZ().toString());
         out.println("[EOF]");
         String line = in.readLine();
 //        System.out.println(line);

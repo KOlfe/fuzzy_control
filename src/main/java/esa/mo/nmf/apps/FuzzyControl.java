@@ -76,18 +76,18 @@ public class FuzzyControl {
     protected static final int REFRESH_RATE =200;
     static Quaternion currentAttitude = new Quaternion();
     private static Quaternion targetAttitude = new Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
-    static Quaternion error = new Quaternion();
+    static Quaternion error = new Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
     static Quaternion previousError = new Quaternion(0f, 0f, 0f, 0f);
     static Quaternion errorDerivative = new Quaternion();
     static VectorF3D angularVelocity = new VectorF3D(0.0f, 0.0f, 0.0f);
     static VectorF3D magneticField = new VectorF3D();
-    static VectorF3D actuation = new VectorF3D();
+    static VectorF3D actuation = new VectorF3D(0.0f, 0.0f, 0.0f);
     static VectorF3D torque = new VectorF3D(0.0f, 0.0f, 0.0f);
     static FloatList wheelTargetVelocities = new FloatList(3);
     static FunctionBlock fb_x;
     static FunctionBlock fb_y;
     static FunctionBlock fb_z;
-    private static String controllerType = "Hinfty";
+    private static String controllerType = "Fuzzy";
     static ScriptExecutor TIMELINE_EXECUTOR = new ScriptExecutor("timeline.js");
     public static boolean desaturating = false;
     static final Float WHEEL_MAX_SPEED = (float)(0.8*10000.0*PI/30.0) ;
@@ -200,7 +200,7 @@ public class FuzzyControl {
     
     static void executeMain(int refreshRate, int initialDelay){
         int i=0;
-        while (i < 600*1000/REFRESH_RATE) {
+        while (i < 600*1000/200) {
             i=i+1;
         // TIMER.scheduleTask(new Thread() {
         //     @Override 
@@ -223,10 +223,11 @@ public class FuzzyControl {
                     OrbitalFrame.getOrbitalFrame();
                     currentAttitude = OrbitalFrame.getOrbitalAttitude();
 //                    System.out.println("atitude = "+currentAttitude.toString());
-                    if (controlFlag){
+                    // if (controlFlag){
+                    if ((i % 1)==0){
                         executeControlLoop();
-                        Comms.write42(torque);
                     }
+                    Comms.write42(torque);
                     reconnectionTry = 0;
                     Util.writeTelemtry();
 //                } catch (NMFException | IOException | MALInteractionException | MALException ex) {
