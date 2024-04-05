@@ -21,6 +21,7 @@ import org.ccsds.moims.mo.platform.gps.body.GetLastKnownPositionResponse;
 import org.hipparchus.geometry.euclidean.threed.Rotation;
 import org.hipparchus.geometry.euclidean.threed.RotationConvention;
 import org.hipparchus.geometry.euclidean.threed.RotationOrder;
+import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.util.FastMath;
 import org.orekit.attitudes.NadirPointing;
 import org.orekit.bodies.CelestialBodyFactory;
@@ -28,6 +29,7 @@ import org.orekit.bodies.GeodeticPoint;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
+import org.orekit.frames.TopocentricFrame;
 import org.orekit.frames.Transform;
 import org.orekit.propagation.analytical.tle.SGP4;
 import org.orekit.propagation.analytical.tle.TLE;
@@ -119,10 +121,21 @@ public class OrbitalFrame {
 //            System.out.println("nadir: "+nadir);
 
 // Nadir from simulation
-        nadir = Comms.nadir;
-        
+        // nadir = Comms.nadir;
 
-        
+
+// Geodetic pointing 
+        Frame earthFrame = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
+        OneAxisEllipsoid earth = new OneAxisEllipsoid(Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
+                                        Constants.WGS84_EARTH_FLATTENING,
+                                        earthFrame);
+        GeodeticPoint eusocGroundStation = new GeodeticPoint(FastMath.toRadians(35.959319395639305), FastMath.toRadians(-5.480117648564497), 0.0);
+        TopocentricFrame staF = new TopocentricFrame(earth, eusocGroundStation, "station");
+        Vector3D station = staF.getTransformTo(inertialFrame, OS_date).transformPosition(new Vector3D(0.0,0.0,0.0));
+        nadir = station.subtract(Comms.PosN);
+
+
+
 //        System.out.println(nadir);
 //        Quaternion inertialAttitude = FuzzyControlAdapter.getInertialAttitude();
 //        System.out.println("inertial attitude = "+inertialAttitude.getA()

@@ -37,6 +37,7 @@ public static Quaternion inertialAttitude = new Quaternion();
 public static FloatList wheelsSpeed = new FloatList(3);
 public static VectorF3D m = new VectorF3D(0.0f, 0.0f, 0.0f);
 public static VectorF3D B = new VectorF3D(0.0f, 0.0f, 0.0f);
+public static Vector3D PosN;
 public static Vector3D nadir;
 public static Vector3D velocityVersor;
 public static AbsoluteDate simDateTime = AbsoluteDate.JAVA_EPOCH;
@@ -67,7 +68,7 @@ public static void read42(){
         parseDateandTime(line);
         line = in.readLine();
        String pos[] = line.split(" ");
-       Vector3D PosN = new Vector3D(Double.parseDouble(pos[2]), Double.parseDouble(pos[3]), Double.parseDouble(pos[4]));
+       PosN = new Vector3D(Double.parseDouble(pos[2]), Double.parseDouble(pos[3]), Double.parseDouble(pos[4]));
        nadir = PosN.negate().normalize();
 //        System.out.println("nadir 42: "+PosN.negate().normalize().toString());
         line = in.readLine();
