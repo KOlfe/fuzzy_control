@@ -87,7 +87,7 @@ public class FuzzyControl {
     static FunctionBlock fb_x;
     static FunctionBlock fb_y;
     static FunctionBlock fb_z;
-    private static String controllerType = "Fuzzy";
+    private static String controllerType = "Fuzzy"; //"PID"; //"Hinfty"; //     
     static ScriptExecutor TIMELINE_EXECUTOR = new ScriptExecutor("timeline.js");
     public static boolean desaturating = false;
     static final Float WHEEL_MAX_SPEED = (float)(0.8*10000.0*PI/30.0) ;
@@ -106,7 +106,7 @@ public class FuzzyControl {
     static HinftyController Hx = new HinftyController("defaultX");
     static HinftyController Hy = new HinftyController("defaultY");
     static HinftyController Hz = new HinftyController("defaultZ");
-
+    static Float cmdError = 0.0f;
  //   static SEPP_IADCS_API adcsApi= new SEPP_IADCS_API();
 
     /**
@@ -118,6 +118,7 @@ public class FuzzyControl {
     public static void main(final String args[]) {
         if(args.length!=0){
             Comms.setPortNumber(Integer.parseInt(args[0]),Integer.parseInt(args[1]));
+            cmdError = Float.parseFloat(args[2]);
             PrintWriter headerWriter = null;
             try {
                 headerWriter = new PrintWriter(new FileWriter(FuzzyControl.TELEMETRY_FILE, true));
@@ -200,7 +201,7 @@ public class FuzzyControl {
     
     static void executeMain(int refreshRate, int initialDelay){
         int i=0;
-        while (i < 600*1000/200) {
+        while (i < 700*1000/REFRESH_RATE) {
             i=i+1;
         // TIMER.scheduleTask(new Thread() {
         //     @Override 
@@ -373,14 +374,15 @@ public class FuzzyControl {
                 actuation.setZ((float)1.0*signum(actuation.getZ()));
             }
              
-            //actuation in torque with 10% of whell comand error
-            // torque.setX(actuation.getX()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
-            // torque.setY(actuation.getY()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
-            // torque.setZ(actuation.getZ()*WHEEL_MAX_TORQUE+0.1f*WHEEL_MAX_TORQUE);
+            //actuation in torque with cmdError% of whell comand error
+            torque.setX(actuation.getX()*WHEEL_MAX_TORQUE+cmdError*WHEEL_MAX_TORQUE);
+            torque.setY(actuation.getY()*WHEEL_MAX_TORQUE+cmdError*WHEEL_MAX_TORQUE);
+            torque.setZ(actuation.getZ()*WHEEL_MAX_TORQUE+cmdError*WHEEL_MAX_TORQUE);
+            
             //Nominal actuation in torque
-           torque.setX(actuation.getX()*WHEEL_MAX_TORQUE);
-           torque.setY(actuation.getY()*WHEEL_MAX_TORQUE);
-           torque.setZ(actuation.getZ()*WHEEL_MAX_TORQUE);
+        //    torque.setX(actuation.getX()*WHEEL_MAX_TORQUE);
+        //    torque.setY(actuation.getY()*WHEEL_MAX_TORQUE);
+        //    torque.setZ(actuation.getZ()*WHEEL_MAX_TORQUE);
 //            System.out.println("torque commanded ="+torque);
             
             

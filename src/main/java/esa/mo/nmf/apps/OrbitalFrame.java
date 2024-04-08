@@ -106,6 +106,7 @@ public class OrbitalFrame {
 //  *****
 
 //  Nadir from NMF GPS (without propagation)
+//  ****************************************
 //        GeodeticPoint opssatOnEarth = new GeodeticPoint(FastMath.toRadians(latitude), FastMath.toRadians(longitude), altitude);
 ////        System.out.println(opssatOnEarth.getNadir());
 //        Frame earthFrame = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
@@ -115,24 +116,27 @@ public class OrbitalFrame {
 //            System.out.println("orekit TLE line 2= "+opsSatTLE.getLine2());
 
 //  Nadir from TLE propagation
+//  **************************
         // SGP4 propagator = new SGP4(opsSatTLE, new NadirPointing(inertialFrame, earthShape), 5.777673);
         // nadir = propagator.propagate(OS_date).getOrbit().getPVCoordinates().getPosition().negate().normalize();
         // nadir = TEMEFrame.getTransformTo(inertialFrame, OS_date).transformPosition(nadir);
 //            System.out.println("nadir: "+nadir);
 
 // Nadir from simulation
-        // nadir = Comms.nadir;
+// *********************
+        nadir = Comms.nadir;
 
 
 // Geodetic pointing 
-        Frame earthFrame = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
-        OneAxisEllipsoid earth = new OneAxisEllipsoid(Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
-                                        Constants.WGS84_EARTH_FLATTENING,
-                                        earthFrame);
-        GeodeticPoint eusocGroundStation = new GeodeticPoint(FastMath.toRadians(35.959319395639305), FastMath.toRadians(-5.480117648564497), 0.0);
-        TopocentricFrame staF = new TopocentricFrame(earth, eusocGroundStation, "station");
-        Vector3D station = staF.getTransformTo(inertialFrame, OS_date).transformPosition(new Vector3D(0.0,0.0,0.0));
-        nadir = station.subtract(Comms.PosN);
+// *****************
+        // Frame earthFrame = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
+        // OneAxisEllipsoid earth = new OneAxisEllipsoid(Constants.WGS84_EARTH_EQUATORIAL_RADIUS,0.0,
+        //                                 // Constants.WGS84_EARTH_FLATTENING,
+        //                                 earthFrame);
+        // GeodeticPoint eusocGroundStation = new GeodeticPoint(FastMath.toRadians(35.959319395639305), FastMath.toRadians(-5.480117648564497), 0.0);
+        // TopocentricFrame staF = new TopocentricFrame(earth, eusocGroundStation, "station");
+        // Vector3D station = staF.getTransformTo(inertialFrame, OS_date).transformPosition(new Vector3D(0.0,0.0,0.0));
+        // nadir = station.subtract(Comms.PosN);
 
 
 
