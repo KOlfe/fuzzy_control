@@ -87,7 +87,7 @@ public class FuzzyControl {
     static FunctionBlock fb_x;
     static FunctionBlock fb_y;
     static FunctionBlock fb_z;
-    private static String controllerType = "Fuzzy"; //"PID"; //"Hinfty"; //     
+    private static String controllerType = "PID"; // "Fuzzy"; // "Hinfty"; //  
     static ScriptExecutor TIMELINE_EXECUTOR = new ScriptExecutor("timeline.js");
     public static boolean desaturating = false;
     static final Float WHEEL_MAX_SPEED = (float)(0.8*10000.0*PI/30.0) ;
@@ -103,7 +103,7 @@ public class FuzzyControl {
     static boolean iADCSinitialConectionError=true;
     static int reconnectionTry = 0;
     static boolean controlFlag = true;
-    static HinftyController Hx = new HinftyController("defaultX");
+    static HinftyController Hx = new HinftyController("newX");
     static HinftyController Hy = new HinftyController("defaultY");
     static HinftyController Hz = new HinftyController("defaultZ");
     static Float cmdError = 0.0f;
@@ -150,16 +150,16 @@ public class FuzzyControl {
         // connector.init(adapter);
 //        adapter.startAdcsAttitudeMonitoring();
         
-        initiateFIS("Fuzzy_CP.fcl");
+        initiateFIS("Fuzzy_LE.fcl");
         
         // CP PID gains:
-        PIDComparator.setPIDGains(2.15e+1f, 7.07e-1f, 5.15e+2f, 2.05e+1f, 8.57e-1f, 5.22e+2f, 1.46e+1f, 9.95e-1f, 1.74e+2f);
+        // PIDComparator.setPIDGains(2.15e+1f, 7.07e-1f, 5.15e+2f, 2.05e+1f, 8.57e-1f, 5.22e+2f, 1.46e+1f, 9.95e-1f, 1.74e+2f);
         
         //LC PID gains:
-        // PIDComparator.setPIDGains(5.98e+0f, 5.21e-2f, 3.43e+2f, 1.19e+1f, 1.84e-1f, 5.87e+2f, 3.49e+0f, 1.82e-1f, 9.45e+1f);
+        //  PIDComparator.setPIDGains(5.98e+0f, 5.21e-2f, 3.43e+2f, 1.19e+1f, 1.84e-1f, 5.87e+2f, 3.49e+0f, 1.82e-1f, 9.45e+1f);
        
         //LE PID gains:
-        // PIDComparator.setPIDGains(4.54e+1f, 9.43e-1f, 3.55e+2f, 1.34e+2f, 7.77e-2f, 5.94e+2f, 9.55e+1f, 2.61e-1f, 2.47e+2f);
+        PIDComparator.setPIDGains(4.54e+1f, 9.43e-1f, 3.55e+2f, 1.34e+2f, 7.77e-2f, 5.94e+2f, 9.55e+1f, 2.61e-1f, 2.47e+2f);
 
         
 
@@ -201,7 +201,7 @@ public class FuzzyControl {
     
     static void executeMain(int refreshRate, int initialDelay){
         int i=0;
-        while (i < 700*1000/REFRESH_RATE) {
+        while (i < 600*1000/REFRESH_RATE) {
             i=i+1;
         // TIMER.scheduleTask(new Thread() {
         //     @Override 
@@ -225,7 +225,7 @@ public class FuzzyControl {
                     currentAttitude = OrbitalFrame.getOrbitalAttitude();
 //                    System.out.println("atitude = "+currentAttitude.toString());
                     // if (controlFlag){
-                    if ((i % 1)==0){
+                    if ((i % 2)==0){
                         executeControlLoop();
                     }
                     Comms.write42(torque);
