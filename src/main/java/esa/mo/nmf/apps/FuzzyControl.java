@@ -87,7 +87,7 @@ public class FuzzyControl {
     static FunctionBlock fb_x;
     static FunctionBlock fb_y;
     static FunctionBlock fb_z;
-    private static String controllerType = "PID"; // "Fuzzy"; // "Hinfty"; //  
+    private static String controllerType = "Hinfty"; // "PID"; // "Fuzzy"; //  
     static ScriptExecutor TIMELINE_EXECUTOR = new ScriptExecutor("timeline.js");
     public static boolean desaturating = false;
     static final Float WHEEL_MAX_SPEED = (float)(0.8*10000.0*PI/30.0) ;
@@ -104,8 +104,8 @@ public class FuzzyControl {
     static int reconnectionTry = 0;
     static boolean controlFlag = true;
     static HinftyController Hx = new HinftyController("newX");
-    static HinftyController Hy = new HinftyController("defaultY");
-    static HinftyController Hz = new HinftyController("defaultZ");
+    static HinftyController Hy = new HinftyController("newY");
+    static HinftyController Hz = new HinftyController("newZ");
     static Float cmdError = 0.0f;
  //   static SEPP_IADCS_API adcsApi= new SEPP_IADCS_API();
 
