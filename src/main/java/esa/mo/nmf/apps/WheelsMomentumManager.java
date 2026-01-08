@@ -41,7 +41,7 @@ public class WheelsMomentumManager extends Thread{
         
         while (true) {
             try {
-                Thread.sleep(5);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -80,7 +80,7 @@ public class WheelsMomentumManager extends Thread{
             m.setZ(m.getZ()*MAXIMUM_DIPOLE_MOMENT_XY);
             
             if (abs(m.getZ())>MAXIMUM_DIPOLE_MOMENT_Z) {
-                Float scale = MAXIMUM_DIPOLE_MOMENT_Z/m.getZ();
+                Float scale = abs(MAXIMUM_DIPOLE_MOMENT_Z/m.getZ());
                 m.setX(m.getX()*scale);
                 m.setY(m.getY()*scale);
                 m.setZ(m.getZ()*scale);
