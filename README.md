@@ -3,6 +3,9 @@ E-USOC attitude control App to compare different spacecraft attitude control alg
 
 If you are using this repository in academic environments, please cite our publications:
 
+K. Olfe, J. M. Ezquerro, J. Rodríguez, A. Arshadi, A. Laverón-Simavilla and V. Lapuerta, 
+"Attitude control experiment design for OPS-SAT Missions," in IEEE Aerospace and Electronic Systems Magazine, doi: 10.1109/MAES.2026.3664808
+
 Álvaro Bello, Ástor del Castañedo, Karl Stephan Olfe, Jacobo Rodríguez, Victoria Lapuerta,
 Parameterized fuzzy-logic controllers for the attitude control of nanosatellites in low earth orbits. A comparative studio with PID controllers,
 Expert Systems with Applications,
